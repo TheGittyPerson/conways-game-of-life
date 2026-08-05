@@ -1,3 +1,4 @@
+from collections import Counter
 from typing import TYPE_CHECKING
 
 import pygame
@@ -62,14 +63,43 @@ class Grid:
         paused = self.cgol.paused
 
         if not paused:
-            for cell in flattened:
-                cell.update_next_alive_state()
+            self._update_all_next_alive_states()
 
         for cell in flattened:
             cell.use_next_alive_state()
             cell.update_color()
 
         self.draw_all_cells()
+
+    def _update_all_next_alive_states(self):
+        """Update the next alive states of all cells.
+
+        Optimized to only check relevant cells that are alive or are next to
+        living cells.
+        """
+        offset_coords: list[tuple[int, int]] = [
+            (dx, dy)
+            for dx in (-1, 0, 1)
+            for dy in (-1, 0, 1)
+            if not (dx == dy == 0)
+        ]
+
+        living_cells: list[Cell] = self.get_living_cells()
+        neighbor_counter: Counter[Cell | None] = Counter(
+            dict.fromkeys(living_cells, 0)
+        )
+
+        for cell in living_cells:
+            for offset in offset_coords:
+                neighbor_cell = self.get_cell(
+                    cell.gridx + offset[0], cell.gridy + offset[1]
+                )
+                neighbor_counter[neighbor_cell] += 1
+
+        for cell in neighbor_counter:
+            if cell is None:
+                continue
+            cell.update_next_alive_state(neighbor_counter[cell])
 
     def create_grid(self) -> None:
         """Create a grid of cells.
@@ -114,7 +144,7 @@ class Grid:
 
         Do nothing if the mouse is outside the grid.
         """
-        target_cell = self._get_cell_at_pos(mouse_pos)
+        target_cell = self.get_cell_at_pos(mouse_pos)
         if target_cell is None:
             return
         target_cell.live()
@@ -124,12 +154,12 @@ class Grid:
 
         Do nothing if the mouse is outside the grid.
         """
-        target_cell = self._get_cell_at_pos(mouse_pos)
+        target_cell = self.get_cell_at_pos(mouse_pos)
         if target_cell is None:
             return
         target_cell.die()
 
-    def _get_cell_at_pos(self, mouse_pos: tuple[int, int]) -> Cell | None:
+    def get_cell_at_pos(self, mouse_pos: tuple[int, int]) -> Cell | None:
         """Get the cell in which the given mouse position lands.
 
         Return None if the mouse is outside the grid.
@@ -150,6 +180,11 @@ class Grid:
             self.cells_array[gridy].append(new_cell)
         except IndexError:
             self.cells_array.append([new_cell])
+
+    def get_living_cells(self) -> list[Cell]:
+        """Get a list of living cells"""
+        return [cell for cell in self.get_flattened_cells_array()
+                if cell.alive]
 
     def get_flattened_cells_array(self):
         return [cell for row in self.cells_array for cell in row]

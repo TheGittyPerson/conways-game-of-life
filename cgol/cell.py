@@ -54,12 +54,11 @@ class Cell(Sprite):
     def rect(self, value: pygame.Rect | pygame.FRect):
         self._rect = value
 
-    def update_next_alive_state(self) -> None:
-        """Update the ``next_alive_state`` of this cell based on neighbors.
+    def update_next_alive_state(self, neighbors: int) -> None:
+        """Update ``next_alive_state`` based on the # of living neighbors.
 
         ``next_alive_state`` is updated, NOT ``alive``.
         """
-        neighbors: int = self._count_living_neighbors()
         if neighbors < 2:
             self.die()
         elif neighbors == 3:
@@ -88,23 +87,3 @@ class Cell(Sprite):
     def kill(self) -> None:
         """Alias for ``die()``."""
         self.die()
-
-    @classmethod
-    def is_alive(cls, cell: Cell | None) -> bool:
-        """Check if this cell is alive.
-
-        Accepts ``None`` (and returns ``False``) to support
-        ``_count_living_neighbors()``.
-        """
-        if cell is None:
-            return False
-        return cell.alive
-
-    def _count_living_neighbors(self) -> int:
-        """Count number of adjacent living neighbors."""
-        return len(list(filter(self.is_alive, [
-            self.cgol.grid.get_cell(self.gridx + dx, self.gridy + dy)
-            for dx in (-1, 0, 1)
-            for dy in (-1, 0, 1)
-            if not (dx == dy == 0)
-        ])))

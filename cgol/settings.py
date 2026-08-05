@@ -11,7 +11,7 @@ class Settings:
         self.dynamic: _DynamicSettings = _DynamicSettings()
         self.cell: _Cell = _Cell()
 
-        self.max_fps: int = 60
+        self.max_fps: int = 100
 
 
 class _WindowSettings:

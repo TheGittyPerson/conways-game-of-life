@@ -6,6 +6,7 @@ def main() -> None:
     cgol = ConwaysGameOfLife()
     print("Starting...")
     cgol.run()
+    print("Done!")
 
 
 if __name__ == "__main__":
