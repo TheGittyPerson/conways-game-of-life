@@ -33,8 +33,8 @@ class _WindowSettings:
 class _Cell:
     def __init__(self):
         # Individual
-        self.width: int = 2
-        self.height: int = 2
+        self.width: int = 5
+        self.height: int = 5
 
         self.alive_color: Color = Color(255, 255, 255)
         self.dead_color: Color = Color(0, 0, 0)
