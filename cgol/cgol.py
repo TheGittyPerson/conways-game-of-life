@@ -41,6 +41,12 @@ class ConwaysGameOfLife:
 
         self._stop()
 
+    def reset_grid(self) -> None:
+        """Reset the grid."""
+        self.grid = Grid(self)
+        self.grid.create_grid()
+        self.paused = True
+
     def _update_screen(self) -> None:
         """Update the screen."""
         self.screen.fill(self.settings.window.bg_color)

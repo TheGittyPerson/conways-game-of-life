@@ -35,6 +35,9 @@ class EventHandler:
             # Toggle pause
             case pygame.K_SPACE:
                 self.cgol.paused = not self.cgol.paused
+            # Reset grid
+            case pygame.K_r:
+                self.cgol.reset_grid()
 
             # Full screen control
             case pygame.K_ESCAPE:
