@@ -14,6 +14,7 @@ class EventHandler:
         self.window = cgol.window
 
         self.mouse_button_down: int | None = None
+        self.secondary_paused: bool = False
 
     def handle_events(self):
         """Check for and respond to key presses and clicks"""
@@ -55,12 +56,14 @@ class EventHandler:
 
     def _handle_mousedown_events(self, event: pygame.event.Event) -> None:
         """Respond to mousedown events."""
+        self.secondary_paused = True
         self.mouse_button_down = pygame.BUTTON_LEFT \
             if event.button == pygame.BUTTON_LEFT else pygame.BUTTON_RIGHT
         self._handle_manual_cell_editing(event)
 
     def _handle_mouseup_events(self) -> None:
         """Respond to mouseup events."""
+        self.secondary_paused = False
         self.mouse_button_down = None
 
     def _handle_mouse_movement_events(self,
