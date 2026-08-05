@@ -16,13 +16,12 @@ class ConwaysGameOfLife:
         self.settings: Settings = Settings()
         self.event_handler: EventHandler = EventHandler(self)
 
-        self.screen = pygame.display.set_mode(
-            self.settings.screen.dimensions,
-            flags=pygame.RESIZABLE | pygame.SCALED | (
-                pygame.FULLSCREEN
-                if self.settings.screen.start_fullscreen else 0
-            ),
+        self.window = pygame.Window(
+            title=self.settings.title,
+            size=self.settings.window.dimensions,
+            resizable=True,
         )
+        self.screen = self.window.get_surface()
 
         self.grid = Grid(self)
 
@@ -33,7 +32,7 @@ class ConwaysGameOfLife:
         """Run the main event loop."""
         self.running = True
 
-        self.screen.fill(self.settings.screen.bg_color)
+        self.screen.fill(self.settings.window.bg_color)
         self.grid.create_grid()
         while self.running:
             self.event_handler.handle_events()
@@ -45,10 +44,10 @@ class ConwaysGameOfLife:
 
     def _update_screen(self) -> None:
         """Update the screen."""
-        self.screen.fill(self.settings.screen.bg_color)
+        self.screen.fill(self.settings.window.bg_color)
         self.grid.update_all_cells()
 
-        pygame.display.flip()
+        self.window.flip()
 
     @staticmethod
     def _stop():

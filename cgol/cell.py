@@ -64,6 +64,8 @@ class Cell(Sprite):
         neighbors: int = self._count_living_neighbors()
         if neighbors < 2:
             self.die()
+        elif neighbors == 2:
+            self.next_alive_state = self.alive
         elif neighbors == 3:
             self.live()
         elif neighbors > 3:

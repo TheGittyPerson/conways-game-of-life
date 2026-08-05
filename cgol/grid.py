@@ -62,7 +62,7 @@ class Grid:
         margins are equal.
         """
         cell_width, cell_height = self.settings.cell.dimensions
-        screen_width, screen_height = pygame.display.get_window_size()
+        screen_width, screen_height = self.cgol.screen.get_size()
 
         x_total_margin: int = screen_width % cell_width
         y_total_margin: int = screen_height % cell_height

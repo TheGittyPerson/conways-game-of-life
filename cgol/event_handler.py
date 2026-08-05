@@ -14,6 +14,8 @@ class EventHandler:
         self.cgol = cgol
         self.settings = cgol.settings
 
+        self.mouse_down = False
+
     def handle_events(self):
         """Check for and respond to key presses and clicks"""
         for event in pygame.event.get():
@@ -23,7 +25,11 @@ class EventHandler:
                 case pygame.KEYDOWN:
                     self._handle_keydown_events(event)
                 case pygame.MOUSEBUTTONDOWN:
+                    self.mouse_down = True
                     self._handle_mousedown_events(event)
+                case pygame.MOUSEBUTTONUP:
+                    self.mouse_down = False
+                # case pygame.MOUSEMOTION
                 case cell.CELL_CLICKED:
                     self._handle_cell_clicked(event)
 
@@ -35,10 +41,10 @@ class EventHandler:
                 self.cgol.paused = not self.cgol.paused
 
             # Full screen control
-            case pygame.K_ESCAPE if pygame.display.is_fullscreen():
-                pygame.display.toggle_fullscreen()
-            case pygame.K_f if not pygame.display.is_fullscreen():
-                pygame.display.toggle_fullscreen()
+            case pygame.K_ESCAPE:
+                self.cgol.window.set_windowed()
+            case pygame.K_f:
+                self.cgol.window.set_fullscreen()
 
             # Quit
             case pygame.K_q:

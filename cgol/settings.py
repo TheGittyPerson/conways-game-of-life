@@ -5,14 +5,17 @@ class Settings:
     """Manage settings for the Game of Life."""
 
     def __init__(self):
-        self.screen: _ScreenSettings = _ScreenSettings()
+        self.title: str = "Conway's Game of Life"
+
+        self.window: _WindowSettings = _WindowSettings()
         self.dynamic: _DynamicSettings = _DynamicSettings()
         self.cell: _Cell = _Cell()
 
         self.max_fps: int = 60
 
 
-class _ScreenSettings:
+class _WindowSettings:
+    """Window and Screen settings."""
     def __init__(self):
         # When not in full screen
         self.width: int = 1000
