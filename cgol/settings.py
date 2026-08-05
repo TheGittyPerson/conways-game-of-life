@@ -23,7 +23,7 @@ class _WindowSettings:
 
         self.bg_color: Color = Color(50, 50, 50)
 
-        self.start_fullscreen: bool = False
+        self.resizable: bool = True
 
     @property
     def dimensions(self) -> tuple[int, int]:

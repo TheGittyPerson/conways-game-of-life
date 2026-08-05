@@ -11,6 +11,7 @@ class EventHandler:
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         self.cgol = cgol
         self.settings = cgol.settings
+        self.window = cgol.window
 
         self.mouse_button_down: int | None = None
 
@@ -18,8 +19,6 @@ class EventHandler:
         """Check for and respond to key presses and clicks"""
         for event in pygame.event.get():
             match event.type:
-                case pygame.QUIT:
-                    self.cgol.running = False
                 case pygame.KEYDOWN:
                     self._handle_keydown_events(event)
                 case pygame.MOUSEBUTTONDOWN:
@@ -28,6 +27,9 @@ class EventHandler:
                     self._handle_mouseup_events()
                 case pygame.MOUSEMOTION:
                     self._handle_mouse_movement_events(event)
+
+                case pygame.QUIT:
+                    self.cgol.running = False
 
     def _handle_keydown_events(self, event: pygame.event.Event) -> None:
         """Respond to keydown events."""
@@ -39,15 +41,17 @@ class EventHandler:
             case pygame.K_r:
                 self.cgol.reset_grid()
 
-            # Full screen control
-            case pygame.K_ESCAPE:
-                self.cgol.window.set_windowed()
-            case pygame.K_f:
-                self.cgol.window.set_fullscreen()
+            # No key command for full screen for now.
+            # There are two different types of "fullscreen" on macOS,
+            # and it's very difficult to get around.
 
             # Quit
             case pygame.K_q:
                 self.cgol.running = False
+
+            # For debugging
+            case pygame.K_d:
+                pass
 
     def _handle_mousedown_events(self, event: pygame.event.Event) -> None:
         """Respond to mousedown events."""

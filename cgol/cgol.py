@@ -14,15 +14,16 @@ class ConwaysGameOfLife:
 
         self.clock = pygame.time.Clock()
         self.settings: Settings = Settings()
-        self.event_handler: EventHandler = EventHandler(self)
 
         self.window = pygame.Window(
             title=self.settings.title,
             size=self.settings.window.dimensions,
+            resizable=self.settings.window.resizable,
         )
         self.screen = self.window.get_surface()
 
         self.grid = Grid(self)
+        self.event_handler: EventHandler = EventHandler(self)
 
         self.running: bool = False
         self.paused: bool = True  # Start paused
