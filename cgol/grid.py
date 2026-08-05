@@ -19,14 +19,46 @@ class Grid:
         self.cells_group = pygame.sprite.Group()
         self.cells_array: list[list[Cell]] = [[]]
 
+    @property
+    def rows(self) -> int:
+        """Return the number of rows in this grid.
+
+        Assume all rows are of the same length.
+        """
+        return len(self.cells_array)
+
+    @property
+    def columns(self) -> int:
+        """Return the number of columns in this grid."""
+        return len(self.cells_array[0])
+
     def update_all_cells(self) -> None:
-        """Update the cells."""
+        """Update all cell states and their colors.
+
+        If the game is paused, next alive states will not be calculated.
+        However, user-induced changes will always be registered (manually
+        aliving/unaliving a cell will instantly update the cell's state and
+        color).
+
+        User-induced changes are detected and controlled in ``EventHandler``.
+        """
+        flattened = self.get_flattened_cells_array()
+        paused = self.cgol.paused
+
+        if not paused:
+            for cell in flattened:
+                cell.update_next_alive_state()
+        for cell in flattened:
+            if not paused:
+                cell.use_next_alive_state()
+            cell.update_color()
+
         self.draw_all_cells()
 
     def create_grid(self) -> None:
         """Create a grid of cells.
 
-        Fills the entire screen. Grid is centered so that any remaining
+        Fill the entire screen. Grid is centered so that any remaining
         margins are equal.
         """
         cell_width, cell_height = self.settings.cell.dimensions
@@ -57,25 +89,21 @@ class Grid:
         """Draw all cells."""
         self.cells_group.draw(self.cgol.screen)
 
-    def get_cell(self, gridx: int, gridy: int) -> Cell:
-        """Get the cell at the given grid position."""
-        return self.cells_array[gridy][gridx]
+    def get_cell(self, gridx: int, gridy: int) -> Cell | None:
+        """Get the cell at the given grid position.
 
-    def handle_cell_clicked(self, event: pygame.event.Event) -> None:
-        """Respond to a cell clicked event."""
-        gridx = event.dict["gridx"]
-        gridy = event.dict["gridy"]
-        target_cell = self.get_cell(gridx, gridy)
-        if event.button == pygame.BUTTON_LEFT:
-            target_cell.live()
-        elif event.button == pygame.BUTTON_RIGHT:
-            target_cell.die()
+        Return ``None`` if the coordinate falls outside the grid.
+        """
+        if 0 <= gridx < self.columns and 0 <= gridy < self.rows:
+            return self.cells_array[gridy][gridx]
+        return None
 
-    def detect_all_clicked_cells(self, mouse_pos: tuple[int, int]) -> None:
+    def detect_all_clicked_cells(self, mouse_pos: tuple[int, int],
+                                 button: int) -> None:
         """Detect for clicks on all cells."""
         for row in self.cells_array:
             for cell in row:
-                cell.detect_click(mouse_pos)
+                cell.detect_click(mouse_pos, button)
 
     def _create_cell(self, posx: int, posy: int,
                      gridx: int, gridy: int) -> None:
@@ -86,3 +114,6 @@ class Grid:
             self.cells_array[gridy].append(new_cell)
         except IndexError:
             self.cells_array.append([new_cell])
+
+    def get_flattened_cells_array(self):
+        return [cell for row in self.cells_array for cell in row]

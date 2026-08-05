@@ -25,13 +25,13 @@ class EventHandler:
                 case pygame.MOUSEBUTTONDOWN:
                     self._handle_mousedown_events(event)
                 case cell.CELL_CLICKED:
-                    self.cgol.grid.handle_cell_clicked(event)
+                    self._handle_cell_clicked(event)
 
     def _handle_keydown_events(self, event: pygame.event.Event) -> None:
         """Respond to keydown events."""
         match event.key:
             # Toggle pause
-            case pygame.K_k:
+            case pygame.K_SPACE:
                 self.cgol.paused = not self.cgol.paused
 
             # Full screen control
@@ -46,4 +46,14 @@ class EventHandler:
 
     def _handle_mousedown_events(self, event: pygame.event.Event) -> None:
         """Respond to mouse click events."""
-        self.cgol.grid.detect_all_clicked_cells(event.pos)
+        self.cgol.grid.detect_all_clicked_cells(event.pos, event.button)
+
+    def _handle_cell_clicked(self, event: pygame.event.Event) -> None:
+        """Respond to a cell clicked event."""
+        gridx = event.dict["gridx"]
+        gridy = event.dict["gridy"]
+        target_cell = self.cgol.grid.get_cell(gridx, gridy)
+        if event.button == pygame.BUTTON_LEFT:
+            target_cell.live(instant=True)
+        elif event.button == pygame.BUTTON_RIGHT:
+            target_cell.die(instant=True)

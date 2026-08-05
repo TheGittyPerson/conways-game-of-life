@@ -33,7 +33,7 @@ class _Cell:
         self.width: int = 5
         self.height: int = 5
 
-        self.alive_color: Color = Color(40, 180, 255)
+        self.alive_color: Color = Color(255, 255, 255)
         self.dead_color: Color = Color(0, 0, 0)
 
     @property
