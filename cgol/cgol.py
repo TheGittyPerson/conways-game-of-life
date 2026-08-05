@@ -19,7 +19,6 @@ class ConwaysGameOfLife:
         self.window = pygame.Window(
             title=self.settings.title,
             size=self.settings.window.dimensions,
-            resizable=True,
         )
         self.screen = self.window.get_surface()
 

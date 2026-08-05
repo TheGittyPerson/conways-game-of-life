@@ -6,8 +6,6 @@ from pygame.sprite import Sprite
 if TYPE_CHECKING:
     from cgol import ConwaysGameOfLife
 
-CELL_CLICKED = pygame.event.custom_type()
-
 
 class Cell(Sprite):
     """Represent a single cell."""
@@ -64,8 +62,6 @@ class Cell(Sprite):
         neighbors: int = self._count_living_neighbors()
         if neighbors < 2:
             self.die()
-        elif neighbors == 2:
-            self.next_alive_state = self.alive
         elif neighbors == 3:
             self.live()
         elif neighbors > 3:
@@ -81,29 +77,17 @@ class Cell(Sprite):
             else self.settings.cell.dead_color
         self.image.fill(self.color)
 
-    def live(self, instant: bool = False) -> None:
-        """Set ``alive`` to ``True``.
+    def live(self) -> None:
+        """Set ``next_alive_state`` to ``True``."""
+        self.next_alive_state = True
 
-        If ``instant`` is ``False``, ``next_alive_state`` will be changed
-        rather than ``alive``. ``alive`` is changed directly when
-        ``instant`` is ``True``.
-        """
-        if instant:
-            self.alive = True
-        else:
-            self.next_alive_state = True
+    def die(self) -> None:
+        """Set ``next_alive_state`` to ``False``"""
+        self.next_alive_state = False
 
-    def die(self, instant: bool = False) -> None:
-        """Set ``next_alive_state`` to ``False``.
-
-        If ``instant`` is ``False``, ``next_alive_state`` will be changed
-        rather than ``alive``. ``alive`` is changed directly when
-        ``instant`` is ``True``.
-        """
-        if instant:
-            self.alive = False
-        else:
-            self.next_alive_state = False
+    def kill(self) -> None:
+        """Alias for ``die()``."""
+        self.die()
 
     @classmethod
     def is_alive(cls, cell: Cell | None) -> bool:
@@ -115,16 +99,6 @@ class Cell(Sprite):
         if cell is None:
             return False
         return cell.alive
-
-    def detect_click(self, mouse_pos: tuple[int, int], button: int) -> None:
-        """Check if clicked and raise a custom event."""
-        if self.rect.collidepoint(mouse_pos):
-            event_data = {
-                "gridx": self.gridx, "gridy": self.gridy,
-                "button": button
-            }
-            cell_event = pygame.event.Event(CELL_CLICKED, event_data)
-            pygame.event.post(cell_event)
 
     def _count_living_neighbors(self) -> int:
         """Count number of adjacent living neighbors."""

@@ -19,9 +19,9 @@ class _WindowSettings:
     def __init__(self):
         # When not in full screen
         self.width: int = 1000
-        self.height: int = 700
+        self.height: int = 600
 
-        self.bg_color: Color = Color(0, 0, 0)
+        self.bg_color: Color = Color(50, 50, 50)
 
         self.start_fullscreen: bool = False
 

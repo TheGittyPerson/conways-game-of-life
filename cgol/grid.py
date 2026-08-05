@@ -32,8 +32,24 @@ class Grid:
         """Return the number of columns in this grid."""
         return len(self.cells_array[0])
 
+    @property
+    def x_single_margin(self) -> int:
+        """Return the width of the left margin of the grid of cells."""
+        cell_width = self.settings.cell.width
+        screen_width = self.cgol.screen.get_width()
+        x_total_margin = screen_width % cell_width
+        return x_total_margin // 2
+
+    @property
+    def y_single_margin(self) -> int:
+        """Return the height of the top margin of the grid of cells."""
+        cell_height = self.settings.cell.height
+        screen_height = self.cgol.screen.get_height()
+        y_total_margin = screen_height % cell_height
+        return y_total_margin // 2
+
     def update_all_cells(self) -> None:
-        """Update all cell states and their colors.
+        """Update all cell states and their colors and draw to screen.
 
         If the game is paused, next alive states will not be calculated.
         However, user-induced changes will always be registered (manually
@@ -48,9 +64,9 @@ class Grid:
         if not paused:
             for cell in flattened:
                 cell.update_next_alive_state()
+
         for cell in flattened:
-            if not paused:
-                cell.use_next_alive_state()
+            cell.use_next_alive_state()
             cell.update_color()
 
         self.draw_all_cells()
@@ -64,22 +80,17 @@ class Grid:
         cell_width, cell_height = self.settings.cell.dimensions
         screen_width, screen_height = self.cgol.screen.get_size()
 
-        x_total_margin: int = screen_width % cell_width
-        y_total_margin: int = screen_height % cell_height
-        x_single_margin: int = x_total_margin // 2
-        y_single_margin: int = y_total_margin // 2
-
-        current_posx, current_posy = x_single_margin, y_single_margin
+        current_posx, current_posy = self.x_single_margin, self.y_single_margin
         current_gridx, current_gridy = 0, 0
-        while current_posy < (screen_height - y_single_margin):
-            while current_posx < (screen_width - x_single_margin):
+        while current_posy < (screen_height - self.y_single_margin):
+            while current_posx < (screen_width - self.x_single_margin):
                 self._create_cell(
                     current_posx, current_posy, current_gridx, current_gridy
                 )
                 current_posx += cell_width
                 current_gridx += 1
 
-            current_posx = x_single_margin
+            current_posx = self.x_single_margin
             current_gridx = 0
 
             current_posy += cell_height
@@ -98,12 +109,37 @@ class Grid:
             return self.cells_array[gridy][gridx]
         return None
 
-    def detect_all_clicked_cells(self, mouse_pos: tuple[int, int],
-                                 button: int) -> None:
-        """Detect for clicks on all cells."""
-        for row in self.cells_array:
-            for cell in row:
-                cell.detect_click(mouse_pos, button)
+    def birth_cell_at_pos(self, mouse_pos: tuple[int, int]) -> None:
+        """Make alive the cell in which the given mouse position lands.
+
+        Do nothing if the mouse is outside the grid.
+        """
+        target_cell = self._get_cell_at_pos(mouse_pos)
+        if target_cell is None:
+            return
+        target_cell.live()
+
+    def kill_cell_at_pos(self, mouse_pos: tuple[int, int]) -> None:
+        """Kill the cell in which the given mouse position lands.
+
+        Do nothing if the mouse is outside the grid.
+        """
+        target_cell = self._get_cell_at_pos(mouse_pos)
+        if target_cell is None:
+            return
+        target_cell.die()
+
+    def _get_cell_at_pos(self, mouse_pos: tuple[int, int]) -> Cell | None:
+        """Get the cell in which the given mouse position lands.
+
+        Return None if the mouse is outside the grid.
+        """
+        mouse_x = mouse_pos[0]
+        mouse_y = mouse_pos[1]
+        gridx = (mouse_x - self.x_single_margin) // self.settings.cell.width
+        gridy = (mouse_y - self.y_single_margin) // self.settings.cell.height
+        cell = self.get_cell(gridx, gridy)
+        return cell
 
     def _create_cell(self, posx: int, posy: int,
                      gridx: int, gridy: int) -> None:

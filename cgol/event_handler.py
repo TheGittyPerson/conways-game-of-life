@@ -2,8 +2,6 @@ from typing import TYPE_CHECKING
 
 import pygame
 
-import cell
-
 if TYPE_CHECKING:
     from cgol import ConwaysGameOfLife
 
@@ -14,7 +12,7 @@ class EventHandler:
         self.cgol = cgol
         self.settings = cgol.settings
 
-        self.mouse_down = False
+        self.mouse_button_down: int | None = None
 
     def handle_events(self):
         """Check for and respond to key presses and clicks"""
@@ -25,13 +23,11 @@ class EventHandler:
                 case pygame.KEYDOWN:
                     self._handle_keydown_events(event)
                 case pygame.MOUSEBUTTONDOWN:
-                    self.mouse_down = True
                     self._handle_mousedown_events(event)
                 case pygame.MOUSEBUTTONUP:
-                    self.mouse_down = False
-                # case pygame.MOUSEMOTION
-                case cell.CELL_CLICKED:
-                    self._handle_cell_clicked(event)
+                    self._handle_mouseup_events()
+                case pygame.MOUSEMOTION:
+                    self._handle_mouse_movement_events(event)
 
     def _handle_keydown_events(self, event: pygame.event.Event) -> None:
         """Respond to keydown events."""
@@ -51,15 +47,31 @@ class EventHandler:
                 self.cgol.running = False
 
     def _handle_mousedown_events(self, event: pygame.event.Event) -> None:
-        """Respond to mouse click events."""
-        self.cgol.grid.detect_all_clicked_cells(event.pos, event.button)
+        """Respond to mousedown events."""
+        self.mouse_button_down = pygame.BUTTON_LEFT \
+            if event.button == pygame.BUTTON_LEFT else pygame.BUTTON_RIGHT
+        self._handle_manual_cell_editing(event)
 
-    def _handle_cell_clicked(self, event: pygame.event.Event) -> None:
-        """Respond to a cell clicked event."""
-        gridx = event.dict["gridx"]
-        gridy = event.dict["gridy"]
-        target_cell = self.cgol.grid.get_cell(gridx, gridy)
-        if event.button == pygame.BUTTON_LEFT:
-            target_cell.live(instant=True)
-        elif event.button == pygame.BUTTON_RIGHT:
-            target_cell.die(instant=True)
+    def _handle_mouseup_events(self) -> None:
+        """Respond to mouseup events."""
+        self.mouse_button_down = None
+
+    def _handle_mouse_movement_events(self,
+                                      event: pygame.event.Event) -> None:
+        """Respond to mouse movement events."""
+        self._handle_manual_cell_editing(event)
+
+    def _handle_manual_cell_editing(self, event: pygame.event.Event) -> None:
+        """Birth or kill cells based on mouse position and button pressed."""
+        if self.mouse_button_down == pygame.BUTTON_LEFT:
+            self.cgol.grid.birth_cell_at_pos(event.pos)
+        if self.mouse_button_down == pygame.BUTTON_RIGHT:
+            self.cgol.grid.kill_cell_at_pos(event.pos)
+
+    def mouse_is_up(self) -> bool:
+        """Check whether no mouse buttons are down."""
+        return self.mouse_button_down is None
+
+    def mouse_is_down(self):
+        """Check whether any mouse button is down."""
+        return self.mouse_button_down is not None
