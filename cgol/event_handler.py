@@ -11,7 +11,6 @@ class EventHandler:
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         self.cgol = cgol
         self.settings = cgol.settings
-        self.window = cgol.window
 
         # State tracking
         self.mouse_button_down: int | None = None

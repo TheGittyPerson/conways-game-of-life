@@ -9,7 +9,7 @@ class Settings:
     def __init__(self):
         self.title: str = "Conway's Game of Life"
 
-        self.window: _WindowSettings = _WindowSettings()
+        self.screen: _ScreenSettings = _ScreenSettings()
         self.dynamic: _DynamicSettings = _DynamicSettings()
         self.cell: _CellSettings = _CellSettings()
         self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
@@ -17,8 +17,7 @@ class Settings:
         self.max_fps: int = 100
 
 
-class _WindowSettings:
-    """Window and Screen settings."""
+class _ScreenSettings:
     def __init__(self):
         # When not in full screen
         self.width: int = 1000
@@ -52,7 +51,7 @@ class _ControlPanelSettings:
         self.padding: int = 20
         self.margin: int = 20  # Only applies to non-center alignments
         self.gap: int = 30  # Gap between control items
-        self.color: Color = Color(255, 255, 255, 50)
+        self.color: Color = Color(255, 255, 255, 10)
 
         self.paused_indicator = _PausedIndicatorSettings()
 
