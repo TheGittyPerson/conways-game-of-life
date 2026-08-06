@@ -22,6 +22,8 @@ class _ScreenSettings:
         # When not in full screen
         self.width: int = 1200
         self.height: int = 700
+        self.min_width: int = 500
+        self.min_height: int = 300
 
         self.bg_color: Color = Color(50, 50, 50)
 

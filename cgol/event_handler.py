@@ -40,7 +40,7 @@ class EventHandler:
             if not window_just_resized:
                 self.window_resized = False
 
-    def _handle_keydown_events(self, event: pygame.event.Event) -> None:
+    def _handle_keydown_events(self, event: pygame.Event) -> None:
         """Respond to keydown events."""
         match event.key:
             # Toggle pause
@@ -65,7 +65,7 @@ class EventHandler:
             case pygame.K_d:
                 pass
 
-    def _handle_mousedown_events(self, event: pygame.event.Event) -> None:
+    def _handle_mousedown_events(self, event: pygame.Event) -> None:
         """Respond to mousedown events."""
         self.secondary_paused = True
         self.mouse_button_down = pygame.BUTTON_LEFT \
@@ -78,11 +78,11 @@ class EventHandler:
         self.mouse_button_down = None
 
     def _handle_mouse_movement_events(self,
-                                      event: pygame.event.Event) -> None:
+                                      event: pygame.Event) -> None:
         """Respond to mouse movement events."""
         self._handle_manual_cell_editing(event)
 
-    def _handle_manual_cell_editing(self, event: pygame.event.Event) -> None:
+    def _handle_manual_cell_editing(self, event: pygame.Event) -> None:
         """Birth or kill cells based on mouse position and button pressed."""
         if self.mouse_button_down == pygame.BUTTON_LEFT:
             self.cgol.grid.birth_cell_at_pos(event.pos)
@@ -92,6 +92,15 @@ class EventHandler:
     def _handle_window_resized_events(self) -> None:
         """Respond to window resized events."""
         self.window_resized = True
+
+        new_width = max(self.settings.screen.min_width, self.cgol.screen.width)
+        new_height = max(self.settings.screen.min_height,
+                         self.cgol.screen.height)
+
+        self.cgol.screen = pygame.display.set_mode(
+            (new_width, new_height),
+            flags=pygame.RESIZABLE if self.settings.screen.resizable else 0
+        )
         self.cgol.alpha_canvas = pygame.Surface(
             self.cgol.screen.size, flags=pygame.SRCALPHA
         )
