@@ -92,6 +92,9 @@ class EventHandler:
     def _handle_window_resized_events(self) -> None:
         """Respond to window resized events."""
         self.window_resized = True
+        self.cgol.alpha_canvas = pygame.Surface(
+            self.cgol.screen.size, flags=pygame.SRCALPHA
+        )
 
     def mouse_is_up(self) -> bool:
         """Check whether no mouse buttons are down."""

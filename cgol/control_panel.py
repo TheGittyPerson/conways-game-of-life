@@ -13,7 +13,6 @@ class ControlPanel:
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize default settings and control items."""
         self.cgol = cgol
-        self.alpha_canvas: pygame.Surface = self.cgol.alpha_canvas
         self.settings = self.cgol.settings
 
         self.padding = self.settings.control_panel.padding
@@ -25,7 +24,9 @@ class ControlPanel:
             _PausedIndicator(cgol)
         ]
 
-        self.canvas_rect: pygame.Rect = self.alpha_canvas.get_rect()
+        # DO NOT initialize own reference to `alpha_canvas`.
+        # When the game window is resized, a new Surface instance is created
+        self.canvas_rect: pygame.Rect = self.cgol.alpha_canvas.get_rect()
         self.rect = self._get_rect()
 
         self.show = True
@@ -38,7 +39,7 @@ class ControlPanel:
         if self.cgol.event_handler.window_resized:
             self.rect = self._get_rect()
 
-        self.alpha_canvas.fill(self.color, self.rect)
+        self.cgol.alpha_canvas.fill(self.color, self.rect)
 
         y = self.rect.y + self.padding
         current_x: int = self.rect.x + self.padding
@@ -52,7 +53,7 @@ class ControlPanel:
             if count != len(self.items):
                 current_x += self.gap
 
-            self.alpha_canvas.blit(item.surface, item_rect)
+            self.cgol.alpha_canvas.blit(item.surface, item_rect)
 
     def _get_rect(self) -> pygame.Rect:
         """Calculate and return the control panel's ``Rect``.
@@ -60,7 +61,7 @@ class ControlPanel:
         Based on paddings, margins, and relative screen locations
         defined in settings.
         """
-        self.canvas_rect = self.alpha_canvas.get_rect()
+        self.canvas_rect = self.cgol.alpha_canvas.get_rect()
 
         # Dimensions
         total_width = (
