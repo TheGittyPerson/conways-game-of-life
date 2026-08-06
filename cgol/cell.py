@@ -4,7 +4,7 @@ import pygame
 from pygame.sprite import Sprite
 
 if TYPE_CHECKING:
-    from cgol import ConwaysGameOfLife
+    from . import ConwaysGameOfLife
 
 
 class Cell(Sprite):

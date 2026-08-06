@@ -4,7 +4,7 @@ import pygame
 import pygame.font
 
 if TYPE_CHECKING:
-    from cgol import ConwaysGameOfLife
+    from . import ConwaysGameOfLife
 
 
 class ControlPanel:

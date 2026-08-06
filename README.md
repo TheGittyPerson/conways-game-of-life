@@ -1,8 +1,18 @@
-# Conway's Game of Life <sub><sup>(v0.1.0)</sup></sub>
+# Conway's Game of Life <sub><sup>(v1.0.0)</sup></sub>
 
-A simple [Conway's Game of Life][wiki] in Python, using the `pygame` library.
+A simple [Conway's Game of Life][wiki] in Python, using the `pygame-ce` library.
+
+## Game Info
+
+- Developed with Python 3.14 (maybe it works on other versions? idk lol)
+- Uses `pygame-ce` as main game library
+- Compatible with macOS, Windows, Linux, and more!
+- Default maximum framerate (or tick rate) is 60 FPS.
+- Extremely light-weight and easy to use with a simple UI
 
 ## How to use
+
+Install Run `python cgol/__main__.py` to start.
 
 The game starts in a paused state.
 
@@ -11,6 +21,7 @@ The game starts in a paused state.
 
 Key commands:
 - `Space`: Pause/Unpause
+- `C`: Hide/Unhide control panel
 - `R`: Reset grid (also resizes grid with more/fewwer pixels if window resized)
 - `Q`: Quit
 

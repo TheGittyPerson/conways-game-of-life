@@ -3,10 +3,10 @@ from typing import TYPE_CHECKING
 
 import pygame
 
-from cell import Cell
+from . import Cell
 
 if TYPE_CHECKING:
-    from cgol import ConwaysGameOfLife
+    from . import ConwaysGameOfLife
 
 
 class Grid:

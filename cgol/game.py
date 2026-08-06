@@ -1,9 +1,9 @@
 import pygame
 
-from settings import Settings
-from grid import Grid
-from event_handler import EventHandler
-from control_panel import ControlPanel
+from . import Settings
+from . import Grid
+from . import EventHandler
+from . import ControlPanel
 
 
 # TODO:

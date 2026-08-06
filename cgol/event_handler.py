@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 import pygame
 
 if TYPE_CHECKING:
-    from cgol import ConwaysGameOfLife
+    from . import ConwaysGameOfLife
 
 
 class EventHandler:

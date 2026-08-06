@@ -1,4 +1,4 @@
-from cgol import ConwaysGameOfLife
+from . import ConwaysGameOfLife
 
 
 def main() -> None:

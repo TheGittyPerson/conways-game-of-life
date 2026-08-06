@@ -58,9 +58,9 @@ class _ControlPanelSettings:
 
 class _PausedIndicatorSettings:
     def __init__(self):
-        self.paused_img_path: Path = (Path(__file__).parent
+        self.paused_img_path: Path = (Path(__file__).parent.parent
                                       / "assets/paused.png").resolve()
-        self.unpaused_img_path: Path = (Path(__file__).parent
+        self.unpaused_img_path: Path = (Path(__file__).parent.parent
                                         / "assets/unpaused.png").resolve()
         self.width: int = 30
 
