@@ -12,9 +12,19 @@ A simple [Conway's Game of Life][wiki] in Python, using the `pygame-ce` library.
 
 ## How to use
 
-Install Run `python cgol/__main__.py` to start.
+Before running, install requirements:
+```shell
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
 
-The game starts in a paused state.
+To start, run:
+```shell
+cd path/to/directory  # Replace with parent directory of the `cgol` package
+python -m cgol
+```
+
+The game starts with a blank screen in a paused state.
 
 - `Left-click + Drag`: temporarily pause and draw (activate cells)
 - `Right-click + Drag`: temporarily pause and erase (kill cells)
@@ -22,7 +32,8 @@ The game starts in a paused state.
 Key commands:
 - `Space`: Pause/Unpause
 - `C`: Hide/Unhide control panel
-- `R`: Reset grid (also resizes grid with more/fewwer pixels if window resized)
+- `R`: Reset grid (also resizes grid with more/fewer pixels if the window 
+  was resized)
 - `Q`: Quit
 
 You can adjust initial settings in `settings.py`.
