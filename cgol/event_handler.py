@@ -13,11 +13,14 @@ class EventHandler:
         self.settings = cgol.settings
         self.window = cgol.window
 
+        # State tracking
         self.mouse_button_down: int | None = None
         self.secondary_paused: bool = False
+        self.window_resized = False
 
     def handle_events(self):
         """Check for and respond to key presses and clicks"""
+        window_just_resized = False
         for event in pygame.event.get():
             match event.type:
                 case pygame.KEYDOWN:
@@ -28,9 +31,15 @@ class EventHandler:
                     self._handle_mouseup_events()
                 case pygame.MOUSEMOTION:
                     self._handle_mouse_movement_events(event)
+                case pygame.WINDOWRESIZED:
+                    window_just_resized = True
+                    self._handle_window_resized_events()
 
                 case pygame.QUIT:
                     self.cgol.running = False
+
+            if not window_just_resized:
+                self.window_resized = False
 
     def _handle_keydown_events(self, event: pygame.event.Event) -> None:
         """Respond to keydown events."""
@@ -41,6 +50,9 @@ class EventHandler:
             # Reset grid
             case pygame.K_r:
                 self.cgol.reset_grid()
+            # Show/hide control panel
+            case pygame.K_c:
+                self.cgol.control_panel.show = not self.cgol.control_panel.show
 
             # No key command for full screen for now.
             # There are two different types of "fullscreen" on macOS,
@@ -77,6 +89,10 @@ class EventHandler:
             self.cgol.grid.birth_cell_at_pos(event.pos)
         if self.mouse_button_down == pygame.BUTTON_RIGHT:
             self.cgol.grid.kill_cell_at_pos(event.pos)
+
+    def _handle_window_resized_events(self) -> None:
+        """Respond to window resized events."""
+        self.window_resized = True
 
     def mouse_is_up(self) -> bool:
         """Check whether no mouse buttons are down."""

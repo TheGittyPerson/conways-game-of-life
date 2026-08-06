@@ -1,8 +1,14 @@
 import pygame
 
+from settings import Settings
 from grid import Grid
 from event_handler import EventHandler
-from settings import Settings
+from control_panel import ControlPanel
+
+# TODO:
+#   - Control game speed (distinct from fps)
+#   - Improve drag to draw by updating all passed cells (calculate with line?)
+#   - Publish as v1.0.0
 
 
 class ConwaysGameOfLife:
@@ -24,6 +30,7 @@ class ConwaysGameOfLife:
 
         self.grid = Grid(self)
         self.event_handler: EventHandler = EventHandler(self)
+        self.control_panel = ControlPanel(self)
 
         self.running: bool = False
         self.paused: bool = True  # Start paused
@@ -52,6 +59,9 @@ class ConwaysGameOfLife:
         """Update the screen."""
         self.screen.fill(self.settings.window.bg_color)
         self.grid.update_all_cells()
+        self.grid.draw_all_cells()
+        if self.control_panel.show:
+            self.control_panel.draw()
 
         self.window.flip()
 

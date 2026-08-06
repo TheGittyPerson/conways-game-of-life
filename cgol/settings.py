@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pygame import Color
 
 
@@ -9,7 +11,8 @@ class Settings:
 
         self.window: _WindowSettings = _WindowSettings()
         self.dynamic: _DynamicSettings = _DynamicSettings()
-        self.cell: _Cell = _Cell()
+        self.cell: _CellSettings = _CellSettings()
+        self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
 
         self.max_fps: int = 100
 
@@ -30,9 +33,8 @@ class _WindowSettings:
         return self.width, self.height
 
 
-class _Cell:
+class _CellSettings:
     def __init__(self):
-        # Individual
         self.width: int = 5
         self.height: int = 5
 
@@ -44,6 +46,33 @@ class _Cell:
         return self.width, self.height
 
 
+class _ControlPanelSettings:
+    def __init__(self):
+        self.screen_align: str = "bottomleft"
+        self.padding: int = 20
+        self.margin: int = 20  # Only applies to non-center alignments
+        self.gap: int = 30  # Gap between control items
+        self.color: Color = Color(255, 255, 255, 50)
+
+        self.paused_indicator = _PausedIndicatorSettings()
+
+
+class _PausedIndicatorSettings:
+    def __init__(self):
+        self.paused_img_path: Path = (Path(__file__).parent
+                                      / "assets/paused.png").resolve()
+        self.unpaused_img_path: Path = (Path(__file__).parent
+                                        / "assets/unpaused.png").resolve()
+        self.width: int = 30
+
+
+class _GameSpeedBarSettings:
+    def __init__(self):
+        self.font: str
+        self.font_size: int = 20
+        self.font_color: Color = Color(255, 255, 255)
+
+
 class _DynamicSettings:
     def __init__(self):
-        self.game_speed: int = 1  # Number of updates per game iteration.
+        self.game_speed: int = 60  # Number of grid updates per second.

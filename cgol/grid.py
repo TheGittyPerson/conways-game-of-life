@@ -69,8 +69,6 @@ class Grid:
             cell.use_next_alive_state()
             cell.update_color()
 
-        self.draw_all_cells()
-
     def _update_all_next_alive_states(self):
         """Update the next alive states of all cells.
 
@@ -187,4 +185,5 @@ class Grid:
                 if cell.alive]
 
     def get_flattened_cells_array(self):
+        """Get all cells as a flattened list."""
         return [cell for row in self.cells_array for cell in row]
