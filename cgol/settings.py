@@ -51,7 +51,7 @@ class _ControlPanelSettings:
         self.padding: int = 20
         self.margin: int = 20  # Only applies to non-center alignments
         self.gap: int = 30  # Gap between control items
-        self.color: Color = Color(255, 255, 255, 10)
+        self.color: Color = Color(255, 255, 255, 50)
 
         self.paused_indicator = _PausedIndicatorSettings()
 

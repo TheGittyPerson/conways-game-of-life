@@ -5,6 +5,7 @@ from grid import Grid
 from event_handler import EventHandler
 from control_panel import ControlPanel
 
+
 # TODO:
 #   - Control game speed (distinct from fps)
 #   - Improve drag to draw by updating all passed cells (calculate with line?)
@@ -26,6 +27,10 @@ class ConwaysGameOfLife:
             flags=pygame.RESIZABLE if self.settings.screen.resizable else 0
         )
         pygame.display.set_caption(self.settings.title)
+        # For elements that need opacity
+        self.alpha_canvas = pygame.Surface(
+            self.settings.screen.dimensions, flags=pygame.SRCALPHA
+        )
 
         self.grid = Grid(self)
         self.event_handler: EventHandler = EventHandler(self)
@@ -57,10 +62,12 @@ class ConwaysGameOfLife:
     def _update_screen(self) -> None:
         """Update the screen."""
         self.screen.fill(self.settings.screen.bg_color)
+        self.alpha_canvas.fill((0, 0, 0, 0))
         self.grid.update_all_cells()
         self.grid.draw_all_cells()
         if self.control_panel.show:
             self.control_panel.draw()
+        self.screen.blit(self.alpha_canvas, (0, 0))
 
         pygame.display.flip()
 
