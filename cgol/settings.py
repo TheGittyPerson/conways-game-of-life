@@ -14,14 +14,14 @@ class Settings:
         self.cell: _CellSettings = _CellSettings()
         self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
 
-        self.max_fps: int = 100
+        self.max_fps: int = 60
 
 
 class _ScreenSettings:
     def __init__(self):
         # When not in full screen
-        self.width: int = 1000
-        self.height: int = 600
+        self.width: int = 1200
+        self.height: int = 700
 
         self.bg_color: Color = Color(50, 50, 50)
 

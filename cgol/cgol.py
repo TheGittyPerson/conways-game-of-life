@@ -7,8 +7,8 @@ from control_panel import ControlPanel
 
 
 # TODO:
-#   - Control game speed (distinct from fps)
 #   - Improve drag to draw by updating all passed cells (calculate with line?)
+#   - Control game speed (distinct from fps)
 #   - Publish as v1.0.0
 
 
