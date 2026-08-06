@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING
 
 import pygame
 import pygame.font
@@ -60,6 +60,8 @@ class ControlPanel:
         Based on paddings, margins, and relative screen locations
         defined in settings.
         """
+        self.screen_rect = self.cgol.screen.get_rect()
+
         # Dimensions
         total_width = (
             sum(item.width for item in self.items)
@@ -71,84 +73,17 @@ class ControlPanel:
             + self.padding * 2
         )
 
-        rect = pygame.Rect(left=0, top=0,
-                           width=total_width, height=total_height)
+        rect = pygame.Rect(0, 0, total_width, total_height)
 
         # Alignment
         align_name: str = self.settings.control_panel.screen_align
-        screen_pos: tuple[int, int] = self._parse_align(
-            align_name, self.screen_rect
-        )
-        self._parse_align(align_name, rect, screen_pos)
+        screen_pos: tuple[int, int] = getattr(self.screen_rect, align_name)
+        setattr(rect, align_name, screen_pos)
 
         # Margins
         self._include_margins(rect, self.margin, align_name)
 
         return rect
-
-    @overload
-    @staticmethod
-    def _parse_align(name: str, rect: pygame.Rect,
-                     set_to: None = None) -> tuple[int, int]: ...
-
-    @overload
-    @staticmethod
-    def _parse_align(name: str, rect: pygame.Rect,
-                     set_to: tuple[int, int]) -> None: ...
-
-    # noinspection SpellCheckingInspection
-    @staticmethod
-    def _parse_align(
-            name: str, rect: pygame.Rect,
-            set_to: tuple[int, int] | None = None) -> tuple[int, int] | None:
-        """Parse the align location string as a location on the given Rect.
-
-        If ``set_to`` is provided, the align location in the given rect
-        will be set to that value. For example, if ``name`` is ``'center'``
-        and ``set_to`` is ``(100,100)``, the center of the given Rect
-        will be at position (100, 100) of the Surface it is on. Nothing
-        will be returned if ``set_to`` is provided.
-        """
-        match name:
-            case "center":
-                if set_to is None:
-                    return rect.center
-                rect.center = set_to
-            case "midbottom":
-                if set_to is None:
-                    return rect.midbottom
-                rect.midbottom = set_to
-            case "midtop":
-                if set_to is None:
-                    return rect.midtop
-                rect.midtop = set_to
-            case "midleft":
-                if set_to is None:
-                    return rect.midleft
-                rect.midleft = set_to
-            case "midright":
-                if set_to is None:
-                    return rect.midright
-                rect.midright = set_to
-            case "topleft":
-                if set_to is None:
-                    return rect.topleft
-                rect.topleft = set_to
-            case "topright":
-                if set_to is None:
-                    return rect.topright
-                rect.topright = set_to
-            case "bottomleft":
-                if set_to is None:
-                    return rect.bottomleft
-                rect.bottomleft = set_to
-            case "bottomright":
-                if set_to is None:
-                    return rect.bottomright
-                rect.bottomright = set_to
-            case _:
-                raise ValueError(f"Invalid align location: '{name}'")
-        return None
 
     # noinspection SpellCheckingInspection
     @staticmethod
@@ -187,6 +122,7 @@ class _ControlItem:
 
         self.width: int = size[0]
         self.height: int = size[1]
+        self._rect = pygame.Rect(0, 0, self.width, self.height)
 
     @property
     def surface(self) -> pygame.Surface:
@@ -196,7 +132,7 @@ class _ControlItem:
     @property
     def rect(self) -> pygame.Rect:
         """Return the ``Rect`` of this control item."""
-        return self.surface.get_rect()
+        return self._rect
 
 
 class _PausedIndicator(_ControlItem):
