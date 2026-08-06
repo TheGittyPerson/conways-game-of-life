@@ -64,13 +64,13 @@ class ControlPanel:
 
         # Dimensions
         total_width = (
-            sum(item.width for item in self.items)
-            + self.padding * 2
-            + self.gap * (len(self.items) - 1)
+                sum(item.width for item in self.items)
+                + self.padding * 2
+                + self.gap * (len(self.items) - 1)
         )
         total_height = (
-            max(item.height for item in self.items)
-            + self.padding * 2
+                max(item.height for item in self.items)
+                + self.padding * 2
         )
 
         rect = pygame.Rect(0, 0, total_width, total_height)
@@ -97,9 +97,11 @@ class ControlPanel:
               to the Rect's ``y``.
             - If ``align='center'``, no margins will be added.
         """
-        if align not in ["center", "midbottom", "midtop", "midleft",
-                         "midright", "topleft", "topright", "bottomleft",
-                         "bottomright"]:
+        if align not in [
+            "center", "midbottom", "midtop", "midleft",
+            "midright", "topleft", "topright", "bottomleft",
+            "bottomright"
+        ]:
             raise ValueError(f"Invalid align location: '{align}'")
 
         if "bottom" in align:
@@ -158,7 +160,9 @@ class _PausedIndicator(_ControlItem):
         Image depending on paused state of the game.
         Reminder: the Surface's Rect has no position.
         """
-        return self.paused_img if self.cgol.paused else self.unpaused_img
+        return (self.paused_img
+                if self.cgol.paused or self.cgol.event_handler.secondary_paused
+                else self.unpaused_img)
 
     def _scale_images(self) -> None:
         """Scale the both images to fit the width defined in settings.
