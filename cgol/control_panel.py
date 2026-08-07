@@ -13,12 +13,12 @@ class ControlPanel:
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize default settings and widgets."""
         self.cgol = cgol
-        self.settings = self.cgol.settings
+        self.cp_settings = self.cgol.settings.control_panel
 
-        self.padding = self.settings.control_panel.padding
-        self.margin = self.settings.control_panel.margin
-        self.gap = self.settings.control_panel.gap
-        self.color = self.settings.control_panel.color
+        self.padding = self.cp_settings.padding
+        self.margin = self.cp_settings.margin
+        self.gap = self.cp_settings.gap
+        self.color = self.cp_settings.color
 
         self.widgets: list[_Widget] = [
             _PausedIcon(cgol),
@@ -77,7 +77,7 @@ class ControlPanel:
         rect = pygame.Rect(0, 0, total_width, total_height)
 
         # Alignment
-        align_name: str = self.settings.control_panel.screen_align
+        align_name: str = self.cp_settings.screen_align
         screen_pos: tuple[int, int] = getattr(self.canvas_rect, align_name)
         setattr(rect, align_name, screen_pos)
 
@@ -142,12 +142,12 @@ class _PausedIcon(_Widget):
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
-        self.settings = cgol.settings
+        self.pi_settings = cgol.settings.control_panel.paused_icon
         self.paused_img: pygame.Surface = pygame.image.load(
-            self.settings.control_panel.paused_icon.paused_img_path
+            self.pi_settings.paused_img_path
         ).convert_alpha()
         self.unpaused_img: pygame.Surface = pygame.image.load(
-            self.settings.control_panel.paused_icon.unpaused_img_path
+            self.pi_settings.unpaused_img_path
         ).convert_alpha()
         self._scale_images()
 
@@ -174,7 +174,7 @@ class _PausedIcon(_Widget):
         if ratio != self.unpaused_img.width / self.unpaused_img.height:
             raise RuntimeError("Images have different size ratios")
 
-        target_width = self.settings.control_panel.paused_icon.width
+        target_width = self.pi_settings.width
         target_height = target_width / ratio
         self.paused_img = pygame.transform.scale(
             self.paused_img, (target_width, target_height)
@@ -189,7 +189,7 @@ class _GameSpeedMeter(_Widget):
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
-        self.settings = cgol.settings.control_panel.game_speed_meter
+        self.gsm_settings = cgol.settings.control_panel.game_speed_meter
         self.dynamic_settings = cgol.settings.dynamic
 
         super().__init__(  # Assuming this would have the longest text ↓
@@ -210,9 +210,9 @@ class _GameSpeedMeter(_Widget):
         See super() call in __init__.)
         """
 
-        return self.settings.font.render(
+        return self.gsm_settings.font.render(
             self._get_text_to_render(speed),
-            antialias=True, color=self.settings.font_color,
+            antialias=True, color=self.gsm_settings.font_color,
         )
 
     def _get_text_to_render(self, speed: float | None = None) -> str:
