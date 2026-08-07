@@ -22,8 +22,9 @@ class ControlPanel:
 
         self.widgets: list[_Widget] = [
             _PausedIcon(cgol),
-            _GameSpeedMeter(cgol),
-            _FramerateMeter(cgol),
+            _GameSpeedWidget(cgol),
+            _FramerateWidget(cgol),
+            _GenerationRateWidget(cgol),
         ]
 
         # DO NOT initialize own reference to `alpha_canvas`.
@@ -231,12 +232,12 @@ class _TextWidget(_Widget):
         raise NotImplementedError
 
 
-class _GameSpeedMeter(_TextWidget):
-    """Manage the game speed meter widget on the control panel."""
+class _GameSpeedWidget(_TextWidget):
+    """Manage the game speed widget on the control panel."""
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
-        self.gsm_settings = cgol.settings.control_panel.game_speed_meter
+        self.gsm_settings = cgol.settings.control_panel.game_speed_widget
         self.dynamic_settings = cgol.settings.dynamic
 
         super().__init__(cgol,
@@ -255,50 +256,79 @@ class _GameSpeedMeter(_TextWidget):
             if speed is None else speed.as_integer_ratio()
         )
         num: str = str(numer) if denom == 1 else f"{numer}/{denom}"
-        return f"{num} generation{"s" if numer/denom != 1 else ""}/sec"
+        return f"{num} generation{"s" if numer / denom != 1 else ""}/frame"
 
 
-class _FramerateMeter(_TextWidget):
-    """Manage the framerate meter widget on the control panel.
+class _FramerateWidget(_TextWidget):
+    """Manage the framerate widget on the control panel.
 
     Framerate is computed by averaging the last ten calls to `Clock.tick()`.
     """
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
-        self.frm_settings = cgol.settings.control_panel.framerate_meter
+        self.oi_settings = cgol.settings.control_panel.other_info
 
         self.max_fps = cgol.settings.max_fps
-        self.dp = self.frm_settings.framerate_decimal_places
-        self.warning_threshold = self.frm_settings.warning_threshold
+        self.dp = self.oi_settings.framerate_decimal_places
+        self.warning_threshold = self.oi_settings.fps_warning_threshold
 
-        self.normal_color = self.frm_settings.font_color
-        self.warning_color = self.frm_settings.warning_font_color
+        self.normal_color = self.oi_settings.font_color
+        self.warning_color = self.oi_settings.fps_warning_font_color
 
-        super().__init__(cgol, color=None, font=self.frm_settings.font,
-                         longest=f"{self.max_fps}.{"0" * self.dp}")
+        super().__init__(cgol, color=None, font=self.oi_settings.font,
+                         longest=self.max_fps)
 
-    def _get_surface(self, text: Any | None = None) -> pygame.Surface:
+    def _get_surface(self, rate: int | None = None) -> pygame.Surface:
         """Get the ``Surface`` of this text widget.
 
-        If ``text`` is ``None``, the actual value to render will be used.
-        Otherwise, use the given string as the text. (This is so that the
-        max possible length of this widget can be passed to ``ControlPanel``.
-        See super() call in __init__.)
+        Text color depends on whether the game framerate dropped below the
+        warning threshold (also defined in settings).
         """
         if self.cgol.clock.get_fps() > self.warning_threshold:
             color = self.normal_color
         else:
             color = self.warning_color
         return self.font.render(
-            self._get_text_to_render(text),
+            self._get_text_to_render(rate),
             antialias=True, color=color,
         )
 
-    def _get_text_to_render(self, rate: str | None = None) -> str:
+    def _get_text_to_render(self, rate: int | None = None) -> str:
         """Get the text to render on screen.
 
         If ``rate`` is ``None``, the actual game speed will be used.
         Otherwise, use the given string as the speed.
         """
-        return f"{round(self.cgol.clock.get_fps(), self.dp)} fps"
+        return f"{self.cgol.clock.get_fps()
+                  if rate is None else rate:.{self.dp}f} fps"
+
+
+class _GenerationRateWidget(_TextWidget):
+    """Manage the generation rate widget on the control panel."""
+
+    def __init__(self, cgol: ConwaysGameOfLife) -> None:
+        """Initialize attributes."""
+        self.cgol = cgol
+        self.oi_settings = cgol.settings.control_panel.other_info
+
+        self.max_fps = cgol.settings.max_fps
+        self.dp = self.oi_settings.gen_rate_decimal_places
+
+        super().__init__(
+            cgol, color=self.oi_settings.font_color,
+            font=self.oi_settings.font,
+            longest=self.max_fps * self.cgol.settings.dynamic.max_game_speed
+        )
+
+    def _get_text_to_render(self, rate: int | None = None) -> str:
+        """Get the text to render on screen.
+
+        If ``rate`` is ``None``, the actual game speed will be used.
+        Otherwise, use the given string as the speed.
+        """
+        game_speed = self.cgol.settings.dynamic.game_speed
+        gens_per_sec = (
+            (self.cgol.clock.get_fps() * game_speed) if rate is None else rate
+        ) if not self.cgol.events.paused else 0
+        return f"{gens_per_sec:.{self.dp}f} gen/s"

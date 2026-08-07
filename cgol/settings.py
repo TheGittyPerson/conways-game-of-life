@@ -51,15 +51,15 @@ class _ControlPanelSettings:
         self.screen_align: str = "bottomleft"
         self.padding: int = 20
         self.margin: int = 20  # Only applies to non-center alignments
-        self.gap: int = 50  # Gap between widgets
+        self.gap: int = 30  # Gap between widgets
         self.color: Color = Color(80, 80, 80, 200)
 
-        self.paused_icon = _PausedIconSettings()
-        self.game_speed_meter = _GameSpeedMeterSettings()
-        self.framerate_meter = _FramerateMeterSettings()
+        self.paused_icon = _PausedIconWidgetSettings()
+        self.game_speed_widget = _GameSpeedMeterWidgetSettings()
+        self.other_info = _OtherGameInfoWidgetSettings()
 
 
-class _PausedIconSettings:
+class _PausedIconWidgetSettings:
     def __init__(self):
         self.paused_img_path: Path = (Path(__file__).parent.parent
                                       / "assets/paused.png").resolve()
@@ -68,22 +68,26 @@ class _PausedIconSettings:
         self.width: int = 30
 
 
-class _GameSpeedMeterSettings:
+class _GameSpeedMeterWidgetSettings:
     def __init__(self):
         self.font: Font = font.SysFont(name="monospace", size=20,
                                        bold=True, italic=False)
         self.font_color: Color = Color(255, 255, 255)
 
 
-class _FramerateMeterSettings:
+class _OtherGameInfoWidgetSettings:
     def __init__(self):
-        self.warning_threshold: int = 35  # warns when FPS drops below this
-        self.framerate_decimal_places: int = 1
-
         self.font: Font = font.SysFont(name="monospace", size=15,
                                        bold=False, italic=False)
         self.font_color: Color = Color(200, 200, 200)
-        self.warning_font_color: Color = Color(255, 70, 70)
+
+        # Framerate Widget
+        self.fps_warning_threshold: int = 35  # warns when FPS drops below this
+        self.fps_warning_font_color: Color = Color(255, 70, 70)
+        self.framerate_decimal_places: int = 1
+
+        # Generation Rate Widget
+        self.gen_rate_decimal_places: int = 1
 
 
 class _DynamicSettings:
