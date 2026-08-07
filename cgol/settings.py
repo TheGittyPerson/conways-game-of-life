@@ -72,8 +72,10 @@ class _GameSpeedBarSettings:
         self.font: str
         self.font_size: int = 20
         self.font_color: Color = Color(255, 255, 255)
+        self.maxed_font_color: Color = Color(255, 0, 0)
 
 
 class _DynamicSettings:
     def __init__(self):
-        self.game_speed: int = 60  # Number of grid updates per second.
+        self.game_speed: float = 5  # Number of grid updates per frame.
+        #                               1.0 is around 60 updates/sec.

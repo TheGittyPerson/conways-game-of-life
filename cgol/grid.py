@@ -20,6 +20,8 @@ class Grid:
         self.cells_group = pygame.sprite.Group()
         self.cells_array: list[list[Cell]] = [[]]
 
+        self.update_accumulator: float = 0.0
+
     @property
     def rows(self) -> int:
         """Return the number of rows in this grid.
@@ -63,11 +65,20 @@ class Grid:
         paused = (self.cgol.events.paused or self.cgol.events.secondary_paused)
 
         if not paused:
-            self._update_all_next_alive_states()
+            self.increment_accumulator()
+            while self.update_accumulator >= 1.0:
+                self._update_all_next_alive_states()
+                for cell in flattened:
+                    cell.use_next_alive_state()
+                self.update_accumulator -= 1.0
 
         for cell in flattened:
             cell.use_next_alive_state()
             cell.update_color()
+
+    def increment_accumulator(self) -> None:
+        """Increment the accumulator by the game speed (updates per frame)."""
+        self.update_accumulator += self.settings.dynamic.game_speed
 
     def _update_all_next_alive_states(self):
         """Update the next alive states of all cells.
