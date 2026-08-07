@@ -36,7 +36,7 @@ class ControlPanel:
 
         Redefine ``self.Rect`` if window was resized.
         """
-        if self.cgol.event_handler.window_resized:
+        if self.cgol.events.window_resized:
             self.rect = self._get_rect()
 
         self.cgol.alpha_canvas.fill(self.color, self.rect)
@@ -162,8 +162,7 @@ class _PausedIndicator(_ControlItem):
         Reminder: the Surface's Rect has no position.
         """
         return (self.paused_img
-                if self.cgol.event_handler.paused or
-                self.cgol.event_handler.secondary_paused
+                if self.cgol.events.paused or self.cgol.events.secondary_paused
                 else self.unpaused_img)
 
     def _scale_images(self) -> None:

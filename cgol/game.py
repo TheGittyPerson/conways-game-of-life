@@ -31,7 +31,7 @@ class ConwaysGameOfLife:
         )
 
         self.grid = Grid(self)
-        self.event_handler: EventHandler = EventHandler(self)
+        self.events: EventHandler = EventHandler(self)
         self.control_panel = ControlPanel(self)
 
         self.running: bool = False
@@ -43,7 +43,7 @@ class ConwaysGameOfLife:
         self.screen.fill(self.settings.screen.bg_color)
         self.grid.create_grid()
         while self.running:
-            self.event_handler.handle_events()
+            self.events.handle_events()
             self._update_screen()
 
             self.clock.tick(self.settings.max_fps)
@@ -54,7 +54,7 @@ class ConwaysGameOfLife:
         """Reset the grid."""
         self.grid = Grid(self)
         self.grid.create_grid()
-        self.event_handler.paused = True
+        self.events.paused = True
 
     def _update_screen(self) -> None:
         """Update the screen."""
