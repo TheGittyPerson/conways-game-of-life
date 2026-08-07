@@ -23,6 +23,7 @@ class ControlPanel:
         self.widgets: list[_Widget] = [
             _PausedIcon(cgol),
             _GameSpeedWidget(cgol),
+            _GenerationCounterWidget(cgol),
             _FramerateWidget(cgol),
             _GenerationRateWidget(cgol),
         ]
@@ -207,14 +208,14 @@ class _TextWidget(_Widget):
         self.color: pygame.Color = color or pygame.Color(0, 0, 0)
 
         self.longest: Any = longest
-        super().__init__(cgol, self._get_surface(self.longest).size)
+        super().__init__(cgol, self.get_surface(self.longest).size)
 
     @property
     def surface(self) -> pygame.Surface:
         """Get the ``Surface`` of this text widget."""
-        return self._get_surface()
+        return self.get_surface()
 
-    def _get_surface(self, text: Any | None = None) -> pygame.Surface:
+    def get_surface(self, text: Any | None = None) -> pygame.Surface:
         """Get the ``Surface`` of this text widget.
 
         If ``text`` is ``None``, the actual value to render will be used.
@@ -223,11 +224,11 @@ class _TextWidget(_Widget):
         See super() call in __init__.)
         """
         return self.font.render(
-            self._get_text_to_render(text),
+            self.get_text_to_render(text),
             antialias=True, color=self.color,
         )
 
-    def _get_text_to_render(self, text: Any | None = None) -> str:
+    def get_text_to_render(self, text: Any | None = None) -> str:
         """Get the text to render on screen."""
         raise NotImplementedError
 
@@ -245,7 +246,7 @@ class _GameSpeedWidget(_TextWidget):
                          color=self.gsm_settings.font_color,
                          longest=self.dynamic_settings.min_game_speed)
 
-    def _get_text_to_render(self, speed: float | None = None) -> str:
+    def get_text_to_render(self, speed: float | None = None) -> str:
         """Get the text to render on screen.
 
         If ``speed`` is ``None``, the actual game speed will be used.
@@ -257,6 +258,33 @@ class _GameSpeedWidget(_TextWidget):
         )
         num: str = str(numer) if denom == 1 else f"{numer}/{denom}"
         return f"{num} generation{"s" if numer / denom != 1 else ""}/frame"
+
+
+class _GenerationCounterWidget(_TextWidget):
+    """Manage the generation count widget on the control panel."""
+
+    def __init__(self, cgol: ConwaysGameOfLife) -> None:
+        """Initialize attributes."""
+        self.cgol = cgol
+        self.gcw_settings = \
+            cgol.settings.control_panel.generations_counter_widget
+        self.cap = self.gcw_settings.counter_cap
+
+        super().__init__(cgol,
+                         font=self.gcw_settings.font,
+                         color=self.gcw_settings.font_color,
+                         longest=self.cap)
+
+    def get_text_to_render(self, count: float | None = None) -> str:
+        """Get the text to render on screen.
+
+        If ``count`` is ``None``, the actual game speed will be used.
+        Otherwise, use the given number as the speed.
+        """
+        if self.cgol.generations <= self.cap:
+            return f"t={self.cgol.generations if count is None else count}"
+        else:
+            return f"t>{self.cap}"
 
 
 class _FramerateWidget(_TextWidget):
@@ -279,7 +307,7 @@ class _FramerateWidget(_TextWidget):
         super().__init__(cgol, color=None, font=self.oi_settings.font,
                          longest=self.max_fps)
 
-    def _get_surface(self, rate: int | None = None) -> pygame.Surface:
+    def get_surface(self, rate: int | None = None) -> pygame.Surface:
         """Get the ``Surface`` of this text widget.
 
         Text color depends on whether the game framerate dropped below the
@@ -290,11 +318,11 @@ class _FramerateWidget(_TextWidget):
         else:
             color = self.warning_color
         return self.font.render(
-            self._get_text_to_render(rate),
+            self.get_text_to_render(rate),
             antialias=True, color=color,
         )
 
-    def _get_text_to_render(self, rate: int | None = None) -> str:
+    def get_text_to_render(self, rate: int | None = None) -> str:
         """Get the text to render on screen.
 
         If ``rate`` is ``None``, the actual game speed will be used.
@@ -321,7 +349,7 @@ class _GenerationRateWidget(_TextWidget):
             longest=self.max_fps * self.cgol.settings.dynamic.max_game_speed
         )
 
-    def _get_text_to_render(self, rate: int | None = None) -> str:
+    def get_text_to_render(self, rate: int | None = None) -> str:
         """Get the text to render on screen.
 
         If ``rate`` is ``None``, the actual game speed will be used.

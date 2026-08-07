@@ -3,6 +3,7 @@ import pygame
 from . import Settings, Grid, EventHandler, ControlPanel
 
 # TODO:
+#   - Remove "longest" attribute and directly access longest in method
 #   - App logo
 #   - README screenshot
 #   - Learn PyCharm
@@ -28,11 +29,12 @@ class ConwaysGameOfLife:
             self.settings.screen.dimensions, flags=pygame.SRCALPHA
         )
 
+        self.running: bool = False
+        self.generations: int = 0
+
         self.grid = Grid(self)
         self.events: EventHandler = EventHandler(self)
         self.control_panel = ControlPanel(self)
-
-        self.running: bool = False
 
     def run(self) -> None:
         """Run the main event loop."""

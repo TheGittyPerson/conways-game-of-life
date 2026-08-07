@@ -56,6 +56,7 @@ class _ControlPanelSettings:
 
         self.paused_icon = _PausedIconWidgetSettings()
         self.game_speed_widget = _GameSpeedMeterWidgetSettings()
+        self.generations_counter_widget = _GenerationCounterWidgetSettings()
         self.other_info = _OtherGameInfoWidgetSettings()
 
 
@@ -73,6 +74,15 @@ class _GameSpeedMeterWidgetSettings:
         self.font: Font = font.SysFont(name="monospace", size=20,
                                        bold=True, italic=False)
         self.font_color: Color = Color(255, 255, 255)
+
+
+class _GenerationCounterWidgetSettings:
+    def __init__(self):
+        self.font: Font = font.SysFont(name="monospace", size=20,
+                                       bold=False, italic=False)
+        self.font_color: Color = Color(255, 255, 255)
+
+        self.counter_cap: int = 9999999
 
 
 class _OtherGameInfoWidgetSettings:

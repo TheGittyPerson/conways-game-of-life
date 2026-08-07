@@ -54,6 +54,8 @@ class Grid:
     def update_all_cells(self) -> None:
         """Update all cell states and their colors and draw to screen.
 
+        Also increment generation count.
+
         If the game is paused, next alive states will not be calculated.
         However, user-induced changes will always be registered (manually
         aliving/unaliving a cell will instantly update the cell's state and
@@ -71,6 +73,7 @@ class Grid:
                 for cell in flattened:
                     cell.use_next_alive_state()
                 self.update_accumulator -= 1.0
+                self.cgol.generations += 1
 
         for cell in flattened:
             cell.use_next_alive_state()
@@ -140,14 +143,22 @@ class Grid:
         self.cells_group.draw(self.cgol.screen)
 
     def clear_all_cells(self) -> None:
-        """Kill all cells and update colors, effectively resetting the grid."""
+        """Kill all cells and update colors, effectively resetting the grid.
+
+        Also resets generation count.
+        """
+        self.cgol.generations = 0
         for cell in self.get_living_cells():
             cell.alive = False
             cell.next_alive_state = False
             cell.update_color()
 
     def destroy(self):
-        """Empty cell Group and array to free memory immediately."""
+        """Empty cell Group and array to free memory immediately.
+
+        Also reset generation count.
+        """
+        self.cgol.generations = 0
         self.cells_group.empty()
         self.cells_array.clear()
 
