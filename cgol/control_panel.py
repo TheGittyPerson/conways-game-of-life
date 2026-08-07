@@ -21,7 +21,7 @@ class ControlPanel:
         self.color = self.settings.control_panel.color
 
         self.items: list[_ControlItem] = [
-            _PausedIndicator(cgol)
+            _PausedIcon(cgol)
         ]
 
         # DO NOT initialize own reference to `alpha_canvas`.
@@ -138,17 +138,17 @@ class _ControlItem:
         return self._rect
 
 
-class _PausedIndicator(_ControlItem):
-    """Manage the paused indicator on the control panel."""
+class _PausedIcon(_ControlItem):
+    """Manage the paused icon on the control panel."""
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
         self.settings = cgol.settings
         self.paused_img: pygame.Surface = pygame.image.load(
-            self.settings.control_panel.paused_indicator.paused_img_path
+            self.settings.control_panel.paused_icon.paused_img_path
         ).convert_alpha()
         self.unpaused_img: pygame.Surface = pygame.image.load(
-            self.settings.control_panel.paused_indicator.unpaused_img_path
+            self.settings.control_panel.paused_icon.unpaused_img_path
         ).convert_alpha()
         self._scale_images()
 
@@ -156,7 +156,7 @@ class _PausedIndicator(_ControlItem):
 
     @property
     def surface(self) -> pygame.Surface:
-        """Get the ``Surface`` of the paused indicator.
+        """Get the ``Surface`` of the paused icon.
 
         Image depending on paused state of the game.
         Reminder: the Surface's Rect has no position.
@@ -175,7 +175,7 @@ class _PausedIndicator(_ControlItem):
         if ratio != self.unpaused_img.width / self.unpaused_img.height:
             raise RuntimeError("Images have different size ratios")
 
-        target_width = self.settings.control_panel.paused_indicator.width
+        target_width = self.settings.control_panel.paused_icon.width
         target_height = target_width / ratio
         self.paused_img = pygame.transform.scale(
             self.paused_img, (target_width, target_height)

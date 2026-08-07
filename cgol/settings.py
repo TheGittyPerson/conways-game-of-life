@@ -41,10 +41,10 @@ class _ControlPanelSettings:
         self.gap: int = 30  # Gap between control items
         self.color: Color = Color(255, 255, 255, 0)
 
-        self.paused_indicator = _PausedIndicatorSettings()
+        self.paused_icon = _PausedIconSettings()
 
 
-class _PausedIndicatorSettings:
+class _PausedIconSettings:
     def __init__(self):
         self.paused_img_path: Path = (Path(__file__).parent.parent
                                       / "assets/paused.png").resolve()
