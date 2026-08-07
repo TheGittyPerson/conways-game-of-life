@@ -1,13 +1,6 @@
 import pygame
 
-from . import Settings
-from . import Grid
-from . import EventHandler
-from . import ControlPanel
-
-
-# TODO:
-#   - Control game speed (distinct from fps)
+from . import Settings, Grid, EventHandler, ControlPanel
 
 
 class ConwaysGameOfLife:
