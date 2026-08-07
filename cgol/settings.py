@@ -51,7 +51,7 @@ class _ControlPanelSettings:
         self.screen_align: str = "bottomleft"
         self.padding: int = 20
         self.margin: int = 20  # Only applies to non-center alignments
-        self.gap: int = 50  # Gap between control items
+        self.gap: int = 50  # Gap between widgets
         self.color: Color = Color(80, 80, 80, 200)
 
         self.paused_icon = _PausedIconSettings()

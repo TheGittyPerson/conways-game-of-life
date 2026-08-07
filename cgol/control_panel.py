@@ -11,7 +11,7 @@ class ControlPanel:
     """Display controls and game state/settings."""
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
-        """Initialize default settings and control items."""
+        """Initialize default settings and widgets."""
         self.cgol = cgol
         self.settings = self.cgol.settings
 
@@ -20,7 +20,7 @@ class ControlPanel:
         self.gap = self.settings.control_panel.gap
         self.color = self.settings.control_panel.color
 
-        self.items: list[_ControlItem] = [
+        self.widgets: list[_Widget] = [
             _PausedIcon(cgol),
             _GameSpeedMeter(cgol),
         ]
@@ -33,7 +33,7 @@ class ControlPanel:
         self.show = True
 
     def draw(self) -> None:
-        """Draw this control panel and all its items to screen.
+        """Draw this control panel and all widgets to screen.
 
         Redefine ``self.Rect`` if window was resized.
         """
@@ -43,17 +43,17 @@ class ControlPanel:
         self.cgol.alpha_canvas.fill(self.color, self.rect)
 
         current_x: int = self.rect.x + self.padding
-        for count, item in enumerate(self.items, start=1):
-            item_rect = item.rect
-            item_rect.center = self.rect.center
+        for count, widget in enumerate(self.widgets, start=1):
+            widget_rect = widget.rect
+            widget_rect.center = self.rect.center
 
-            item_rect.x = current_x
-            current_x += item.width
+            widget_rect.x = current_x
+            current_x += widget.width
 
-            if count != len(self.items):
+            if count != len(self.widgets):
                 current_x += self.gap
 
-            self.cgol.alpha_canvas.blit(item.surface, item_rect)
+            self.cgol.alpha_canvas.blit(widget.surface, widget_rect)
 
     def _get_rect(self) -> pygame.Rect:
         """Calculate and return the control panel's ``Rect``.
@@ -65,12 +65,12 @@ class ControlPanel:
 
         # Dimensions
         total_width = (
-                sum(item.width for item in self.items)
+                sum(widget.width for widget in self.widgets)
                 + self.padding * 2
-                + self.gap * (len(self.items) - 1)
+                + self.gap * (len(self.widgets) - 1)
         )
         total_height = (
-                max(item.height for item in self.items)
+                max(widget.height for widget in self.widgets)
                 + self.padding * 2
         )
 
@@ -115,8 +115,8 @@ class ControlPanel:
             rect.x -= margin
 
 
-class _ControlItem:
-    """Represents an individual item on the control panel."""
+class _Widget:
+    """Represents an individual widget on the control panel."""
 
     def __init__(self, cgol: ConwaysGameOfLife, size: tuple[int, int]) -> None:
         """Initialize attributes."""
@@ -128,16 +128,16 @@ class _ControlItem:
 
     @property
     def surface(self) -> pygame.Surface:
-        """Return the ``Surface`` of this control item."""
+        """Return the ``Surface`` of this widget."""
         raise NotImplementedError
 
     @property
     def rect(self) -> pygame.Rect:
-        """Return the ``Rect`` of this control item."""
+        """Return the ``Rect`` of this widget."""
         return self._rect
 
 
-class _PausedIcon(_ControlItem):
+class _PausedIcon(_Widget):
     """Manage the paused icon on the control panel."""
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
@@ -184,7 +184,7 @@ class _PausedIcon(_ControlItem):
         )
 
 
-class _GameSpeedMeter(_ControlItem):
+class _GameSpeedMeter(_Widget):
     """Manage the game speed meter on the control panel."""
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
