@@ -286,7 +286,7 @@ class _FramerateMeter(_TextWidget):
         max possible length of this widget can be passed to ``ControlPanel``.
         See super() call in __init__.)
         """
-        if self.max_fps - self.cgol.clock.get_fps() < self.warning_threshold:
+        if self.cgol.clock.get_fps() > self.warning_threshold:
             color = self.normal_color
         else:
             color = self.warning_color

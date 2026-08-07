@@ -77,7 +77,7 @@ class _GameSpeedMeterSettings:
 
 class _FramerateMeterSettings:
     def __init__(self):
-        self.warning_threshold: int = 15  # FPS below `max_fps`
+        self.warning_threshold: int = 35  # warns when FPS drops below this
         self.framerate_decimal_places: int = 1
 
         self.font: Font = font.SysFont(name="monospace", size=15,

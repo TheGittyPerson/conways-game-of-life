@@ -3,7 +3,6 @@ import pygame
 from . import Settings, Grid, EventHandler, ControlPanel
 
 # TODO:
-#   - Add fps in control panel
 #   - Add generation # in control panel
 #   - App logo
 #   - README screenshot
