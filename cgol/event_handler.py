@@ -16,6 +16,7 @@ class EventHandler:
         self.secondary_paused: bool = False
         self.mouse_button_down: int | None = None
         self.window_resized = False
+        self.grid_size_synced = True  # With window size
         self.previous_mouse_pos: tuple[int, int] | None = None
 
     def handle_events(self):
@@ -49,7 +50,13 @@ class EventHandler:
                 self.paused = not self.paused
             # Reset grid
             case pygame.K_r:
-                self.cgol.reset_grid()
+                if not self.grid_size_synced:
+                    self.cgol.grid.destroy()
+                    self.cgol.grid.create_grid()
+                    self.grid_size_synced = True
+                else:
+                    self.cgol.grid.clear_all_cells()
+                self.paused = True
             # Show/hide control panel
             case pygame.K_c:
                 self.cgol.control_panel.show = not self.cgol.control_panel.show
@@ -97,6 +104,7 @@ class EventHandler:
     def _handle_window_resized_events(self) -> None:
         """Respond to window resized events."""
         self.window_resized = True
+        self.grid_size_synced = False
 
         new_width = max(self.settings.screen.min_width, self.cgol.screen.width)
         new_height = max(self.settings.screen.min_height,

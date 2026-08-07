@@ -100,9 +100,9 @@ class Grid:
             cell.update_next_alive_state(neighbor_counter[cell])
 
     def create_grid(self) -> None:
-        """Create a grid of cells.
+        """Initialize a grid of cells.
 
-        Fill the entire screen. Grid is centered so that any remaining
+        Grid fills the entire screen. Grid is centered so that any remaining
         margins are equal.
         """
         cell_width, cell_height = self.settings.cell.dimensions
@@ -127,6 +127,18 @@ class Grid:
     def draw_all_cells(self) -> None:
         """Draw all cells."""
         self.cells_group.draw(self.cgol.screen)
+
+    def clear_all_cells(self) -> None:
+        """Kill all cells and update colors, effectively resetting the grid."""
+        for cell in self.get_living_cells():
+            cell.alive = False
+            cell.next_alive_state = False
+            cell.update_color()
+
+    def destroy(self):
+        """Empty cell Group and array to free memory immediately."""
+        self.cells_group.empty()
+        self.cells_array.clear()
 
     def get_cell(self, gridx: int, gridy: int) -> Cell | None:
         """Get the cell at the given grid position.
@@ -205,7 +217,7 @@ class Grid:
             self.cells_array.append([new_cell])
 
     def get_living_cells(self) -> list[Cell]:
-        """Get a list of living cells"""
+        """Get a list of all living cells."""
         return [cell for cell in self.get_flattened_cells_array()
                 if cell.alive]
 
