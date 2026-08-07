@@ -77,11 +77,13 @@ class _GameSpeedMeterSettings:
 
 class _FramerateMeterSettings:
     def __init__(self):
-        self.warning_threshold: int = 10  # FPS below `max_fps`
+        self.warning_threshold: int = 15  # FPS below `max_fps`
+        self.framerate_decimal_places: int = 1
 
-        self.font: Font = font.SysFont(name="", size=15,
+        self.font: Font = font.SysFont(name="monospace", size=15,
                                        bold=False, italic=False)
-        self.warning_font_color: Color = Color(255, 0, 0)
+        self.font_color: Color = Color(200, 200, 200)
+        self.warning_font_color: Color = Color(255, 70, 70)
 
 
 class _DynamicSettings:

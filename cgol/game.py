@@ -3,11 +3,11 @@ import pygame
 from . import Settings, Grid, EventHandler, ControlPanel
 
 # TODO:
-#   - simplify settings calls (make scope specific)
 #   - Add fps in control panel
 #   - Add generation # in control panel
 #   - App logo
 #   - README screenshot
+#   - Learn PyCharm
 
 
 class ConwaysGameOfLife:

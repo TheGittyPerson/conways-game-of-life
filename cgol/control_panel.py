@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import Any, TYPE_CHECKING
 
 import pygame
 import pygame.font
@@ -23,6 +23,7 @@ class ControlPanel:
         self.widgets: list[_Widget] = [
             _PausedIcon(cgol),
             _GameSpeedMeter(cgol),
+            _FramerateMeter(cgol),
         ]
 
         # DO NOT initialize own reference to `alpha_canvas`.
@@ -184,42 +185,70 @@ class _PausedIcon(_Widget):
         )
 
 
-class _GameSpeedMeter(_Widget):
-    """Manage the game speed meter on the control panel."""
+class _TextWidget(_Widget):
+    """Represents a text widget."""
+
+    def __init__(self, cgol: ConwaysGameOfLife, font: pygame.Font,
+                 color: pygame.Color | None, longest: Any) -> None:
+        """Initialize attributes.
+
+        ``longest`` is the longest possible text (as in physical length on
+        screen, not character count) that will be shown. Assumptions will
+        inevitably have to be made. This prevents longer text from
+        overflowing past the widget's initial Rect passed to ``ControlPanel``
+        (control panel dimensions are static).
+        """
+        self.cgol = cgol  # Initialize first cuz `_get_surface` or the
+        #                   methods it calls might need it.
+        self.dynamic_settings = cgol.settings.dynamic
+
+        self.font: pygame.Font = font
+        self.color: pygame.Color = color or pygame.Color(0, 0, 0)
+
+        self.longest: Any = longest
+        super().__init__(cgol, self._get_surface(self.longest).size)
+
+    @property
+    def surface(self) -> pygame.Surface:
+        """Get the ``Surface`` of this text widget."""
+        return self._get_surface()
+
+    def _get_surface(self, text: Any | None = None) -> pygame.Surface:
+        """Get the ``Surface`` of this text widget.
+
+        If ``text`` is ``None``, the actual value to render will be used.
+        Otherwise, use the given string as the text. (This is so that the
+        max possible length of this widget can be passed to ``ControlPanel``.
+        See super() call in __init__.)
+        """
+        return self.font.render(
+            self._get_text_to_render(text),
+            antialias=True, color=self.color,
+        )
+
+    def _get_text_to_render(self, text: Any | None = None) -> str:
+        """Get the text to render on screen."""
+        raise NotImplementedError
+
+
+class _GameSpeedMeter(_TextWidget):
+    """Manage the game speed meter widget on the control panel."""
 
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
         self.gsm_settings = cgol.settings.control_panel.game_speed_meter
         self.dynamic_settings = cgol.settings.dynamic
 
-        super().__init__(  # Assuming this would have the longest text ↓
-            cgol, self._get_surface(self.dynamic_settings.min_game_speed).size
-        )
-
-    @property
-    def surface(self) -> pygame.Surface:
-        """Get the ``Surface`` of the game speed meter."""
-        return self._get_surface()
-
-    def _get_surface(self, speed: float | None = None) -> pygame.Surface:
-        """Get the ``Surface`` of the game speed meter.
-
-        If ``speed`` is ``None``, the actual game speed will be used.
-        Otherwise, use the given string as the speed. (This is so that the
-        max possible length of this widget can be passed to ``ControlPanel``.
-        See super() call in __init__.)
-        """
-
-        return self.gsm_settings.font.render(
-            self._get_text_to_render(speed),
-            antialias=True, color=self.gsm_settings.font_color,
-        )
+        super().__init__(cgol,
+                         font=self.gsm_settings.font,
+                         color=self.gsm_settings.font_color,
+                         longest=self.dynamic_settings.min_game_speed)
 
     def _get_text_to_render(self, speed: float | None = None) -> str:
         """Get the text to render on screen.
 
         If ``speed`` is ``None``, the actual game speed will be used.
-        Otherwise, use the given string as the speed.
+        Otherwise, use the given number as the speed.
         """
         numer, denom = (
             self.dynamic_settings.game_speed.as_integer_ratio()
@@ -227,3 +256,49 @@ class _GameSpeedMeter(_Widget):
         )
         num: str = str(numer) if denom == 1 else f"{numer}/{denom}"
         return f"{num} generation{"s" if numer/denom != 1 else ""}/sec"
+
+
+class _FramerateMeter(_TextWidget):
+    """Manage the framerate meter widget on the control panel.
+
+    Framerate is computed by averaging the last ten calls to `Clock.tick()`.
+    """
+
+    def __init__(self, cgol: ConwaysGameOfLife) -> None:
+        """Initialize attributes."""
+        self.frm_settings = cgol.settings.control_panel.framerate_meter
+
+        self.max_fps = cgol.settings.max_fps
+        self.dp = self.frm_settings.framerate_decimal_places
+        self.warning_threshold = self.frm_settings.warning_threshold
+
+        self.normal_color = self.frm_settings.font_color
+        self.warning_color = self.frm_settings.warning_font_color
+
+        super().__init__(cgol, color=None, font=self.frm_settings.font,
+                         longest=f"{self.max_fps}.{"0" * self.dp}")
+
+    def _get_surface(self, text: Any | None = None) -> pygame.Surface:
+        """Get the ``Surface`` of this text widget.
+
+        If ``text`` is ``None``, the actual value to render will be used.
+        Otherwise, use the given string as the text. (This is so that the
+        max possible length of this widget can be passed to ``ControlPanel``.
+        See super() call in __init__.)
+        """
+        if self.max_fps - self.cgol.clock.get_fps() < self.warning_threshold:
+            color = self.normal_color
+        else:
+            color = self.warning_color
+        return self.font.render(
+            self._get_text_to_render(text),
+            antialias=True, color=color,
+        )
+
+    def _get_text_to_render(self, rate: str | None = None) -> str:
+        """Get the text to render on screen.
+
+        If ``rate`` is ``None``, the actual game speed will be used.
+        Otherwise, use the given string as the speed.
+        """
+        return f"{round(self.cgol.clock.get_fps(), self.dp)} fps"
