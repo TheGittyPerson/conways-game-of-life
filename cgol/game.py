@@ -7,9 +7,7 @@ from . import ControlPanel
 
 
 # TODO:
-#   - Improve drag to draw by updating all passed cells (calculate with line?)
 #   - Control game speed (distinct from fps)
-#   - Publish as v1.0.0
 
 
 class ConwaysGameOfLife:
@@ -37,7 +35,6 @@ class ConwaysGameOfLife:
         self.control_panel = ControlPanel(self)
 
         self.running: bool = False
-        self.paused: bool = True  # Start paused
 
     def run(self) -> None:
         """Run the main event loop."""
@@ -57,7 +54,7 @@ class ConwaysGameOfLife:
         """Reset the grid."""
         self.grid = Grid(self)
         self.grid.create_grid()
-        self.paused = True
+        self.event_handler.paused = True
 
     def _update_screen(self) -> None:
         """Update the screen."""

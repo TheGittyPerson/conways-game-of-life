@@ -60,7 +60,8 @@ class Grid:
         User-induced changes are detected and controlled in ``EventHandler``.
         """
         flattened = self.get_flattened_cells_array()
-        paused = self.cgol.paused or self.cgol.event_handler.secondary_paused
+        paused = (self.cgol.event_handler.paused or
+                  self.cgol.event_handler.secondary_paused)
 
         if not paused:
             self._update_all_next_alive_states()

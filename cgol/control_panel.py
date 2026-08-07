@@ -162,7 +162,8 @@ class _PausedIndicator(_ControlItem):
         Reminder: the Surface's Rect has no position.
         """
         return (self.paused_img
-                if self.cgol.paused or self.cgol.event_handler.secondary_paused
+                if self.cgol.event_handler.paused or
+                self.cgol.event_handler.secondary_paused
                 else self.unpaused_img)
 
     def _scale_images(self) -> None:

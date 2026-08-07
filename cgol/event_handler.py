@@ -12,10 +12,11 @@ class EventHandler:
         self.cgol = cgol
         self.settings = cgol.settings
 
-        # State tracking
-        self.mouse_button_down: int | None = None
+        self.paused: bool = True  # Start paused
         self.secondary_paused: bool = False
+        self.mouse_button_down: int | None = None
         self.window_resized = False
+        self.previous_mouse_pos: tuple[int, int] | None = None
 
     def handle_events(self):
         """Check for and respond to key presses and clicks"""
@@ -45,7 +46,7 @@ class EventHandler:
         match event.key:
             # Toggle pause
             case pygame.K_SPACE:
-                self.cgol.paused = not self.cgol.paused
+                self.paused = not self.paused
             # Reset grid
             case pygame.K_r:
                 self.cgol.reset_grid()
@@ -68,6 +69,7 @@ class EventHandler:
     def _handle_mousedown_events(self, event: pygame.Event) -> None:
         """Respond to mousedown events."""
         self.secondary_paused = True
+        self.previous_mouse_pos = event.pos
         self.mouse_button_down = pygame.BUTTON_LEFT \
             if event.button == pygame.BUTTON_LEFT else pygame.BUTTON_RIGHT
         self._handle_manual_cell_editing(event)
