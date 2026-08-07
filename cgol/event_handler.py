@@ -48,6 +48,11 @@ class EventHandler:
             # Toggle pause
             case pygame.K_SPACE:
                 self.paused = not self.paused
+            # Game speed
+            case pygame.K_UP | pygame.K_RIGHT:
+                self.settings.dynamic.increase_game_speed()
+            case pygame.K_DOWN | pygame.K_LEFT:
+                self.settings.dynamic.decrease_game_speed()
             # Reset grid
             case pygame.K_r:
                 if not self.grid_size_synced:

@@ -77,7 +77,7 @@ class Grid:
             cell.update_color()
 
     def increment_accumulator(self) -> None:
-        """Increment the accumulator by the game speed (updates per frame)."""
+        """Increment the accumulator by the game speed (gens per frame)."""
         self.update_accumulator += self.settings.dynamic.game_speed
 
     def _update_all_next_alive_states(self):

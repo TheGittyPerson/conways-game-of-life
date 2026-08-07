@@ -2,6 +2,11 @@ import pygame
 
 from . import Settings, Grid, EventHandler, ControlPanel
 
+# TODO:
+#   - Add gen/s in control panel
+#   - Add fps in control
+#   - App logo
+
 
 class ConwaysGameOfLife:
     """Control and manage a new Game of Life."""

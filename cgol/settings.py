@@ -3,20 +3,6 @@ from pathlib import Path
 from pygame import Color
 
 
-class Settings:
-    """Manage settings for the Game of Life."""
-
-    def __init__(self):
-        self.title: str = "Conway's Game of Life"
-
-        self.screen: _ScreenSettings = _ScreenSettings()
-        self.dynamic: _DynamicSettings = _DynamicSettings()
-        self.cell: _CellSettings = _CellSettings()
-        self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
-
-        self.max_fps: int = 60
-
-
 class _ScreenSettings:
     def __init__(self):
         # When not in full screen
@@ -36,8 +22,8 @@ class _ScreenSettings:
 
 class _CellSettings:
     def __init__(self):
-        self.width: int = 5
-        self.height: int = 5
+        self.width: int = 4
+        self.height: int = 4
 
         self.alive_color: Color = Color(255, 255, 255)
         self.dead_color: Color = Color(0, 0, 0)
@@ -77,5 +63,65 @@ class _GameSpeedBarSettings:
 
 class _DynamicSettings:
     def __init__(self):
-        self.game_speed: float = 5  # Number of grid updates per frame.
-        #                               1.0 is around 60 updates/sec.
+        # Number of generations per frame (to start the game with).
+        # 1.0 is around 60 gen/sec on a regular computer (if FPS is set to 60).
+        self._game_speed: float = 1.0
+        self.max_game_speed: float = 10.0
+        self.min_game_speed: float = 1/64
+
+    @property
+    def game_speed(self) -> float:
+        """Game speed in generations per frame."""
+        return min(
+            max(self._game_speed, self.min_game_speed),
+            self.max_game_speed
+        )
+
+    @game_speed.setter
+    def game_speed(self, game_speed: float) -> None:
+        """Game speed in generations per frame."""
+        self._game_speed = min(
+            max(game_speed, self.min_game_speed),
+            self.max_game_speed
+        )
+        print(self._game_speed)
+
+    def increase_game_speed(self):
+        """Increase game speed.
+
+        Game speed is measured in generations per frame.
+        Game speeds less than one increment by 0.25.
+        """
+        if self.game_speed >= 1:
+            self.game_speed += 1
+        elif self.game_speed >= 0.5:
+            self.game_speed += 0.25
+        else:
+            self.game_speed *= 2
+
+    def decrease_game_speed(self):
+        """Decrease game speed.
+
+        Game speed is measured in generations per frame.
+        Game speeds less than one decrement by 0.25
+        """
+        if self.game_speed < 0.5:
+            self.game_speed /= 2
+        elif self.game_speed <= 1:
+            self.game_speed -= 0.25
+        else:
+            self.game_speed -= 1
+
+
+class Settings:
+    """Manage settings for the Game of Life."""
+
+    def __init__(self):
+        self.title: str = "Conway's Game of Life"
+
+        self.screen: _ScreenSettings = _ScreenSettings()
+        self.dynamic: _DynamicSettings = _DynamicSettings()
+        self.cell: _CellSettings = _CellSettings()
+        self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
+
+        self.max_fps: int = 60
