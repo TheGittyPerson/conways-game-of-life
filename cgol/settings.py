@@ -1,6 +1,19 @@
 from pathlib import Path
 
-from pygame import Color
+from pygame import Color, font, Font
+
+
+class Settings:
+    """Manage settings for the Game of Life."""
+
+    def __init__(self):
+        self.title: str = "Conway's Game of Life"
+        self.max_fps: int = 60
+
+        self.screen: _ScreenSettings = _ScreenSettings()
+        self.dynamic: _DynamicSettings = _DynamicSettings()
+        self.cell: _CellSettings = _CellSettings()
+        self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
 
 
 class _ScreenSettings:
@@ -38,10 +51,12 @@ class _ControlPanelSettings:
         self.screen_align: str = "bottomleft"
         self.padding: int = 20
         self.margin: int = 20  # Only applies to non-center alignments
-        self.gap: int = 30  # Gap between control items
-        self.color: Color = Color(255, 255, 255, 0)
+        self.gap: int = 50  # Gap between control items
+        self.color: Color = Color(80, 80, 80, 200)
 
         self.paused_icon = _PausedIconSettings()
+        self.game_speed_meter = _GameSpeedMeterSettings()
+        self.framerate_meter = _FramerateMeterSettings()
 
 
 class _PausedIconSettings:
@@ -53,12 +68,20 @@ class _PausedIconSettings:
         self.width: int = 30
 
 
-class _GameSpeedBarSettings:
+class _GameSpeedMeterSettings:
     def __init__(self):
-        self.font: str
-        self.font_size: int = 20
+        self.font: Font = font.SysFont(name="monospace", size=20,
+                                       bold=True, italic=False)
         self.font_color: Color = Color(255, 255, 255)
-        self.maxed_font_color: Color = Color(255, 0, 0)
+
+
+class _FramerateMeterSettings:
+    def __init__(self):
+        self.warning_threshold: int = 10  # FPS below `max_fps`
+
+        self.font: Font = font.SysFont(name="", size=15,
+                                       bold=False, italic=False)
+        self.warning_font_color: Color = Color(255, 0, 0)
 
 
 class _DynamicSettings:
@@ -84,7 +107,6 @@ class _DynamicSettings:
             max(game_speed, self.min_game_speed),
             self.max_game_speed
         )
-        print(self._game_speed)
 
     def increase_game_speed(self):
         """Increase game speed.
@@ -111,17 +133,3 @@ class _DynamicSettings:
             self.game_speed -= 0.25
         else:
             self.game_speed -= 1
-
-
-class Settings:
-    """Manage settings for the Game of Life."""
-
-    def __init__(self):
-        self.title: str = "Conway's Game of Life"
-
-        self.screen: _ScreenSettings = _ScreenSettings()
-        self.dynamic: _DynamicSettings = _DynamicSettings()
-        self.cell: _CellSettings = _CellSettings()
-        self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
-
-        self.max_fps: int = 60

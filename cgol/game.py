@@ -4,8 +4,12 @@ from . import Settings, Grid, EventHandler, ControlPanel
 
 # TODO:
 #   - Add gen/s in control panel
-#   - Add fps in control
+#   - Rename control item to widget (update docs)
+#   - simplify settings calls (make scope specific)
+#   - Add fps in control panel
+#   - Add generation # in control panel
 #   - App logo
+#   - README screenshot
 
 
 class ConwaysGameOfLife:

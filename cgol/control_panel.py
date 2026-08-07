@@ -21,7 +21,8 @@ class ControlPanel:
         self.color = self.settings.control_panel.color
 
         self.items: list[_ControlItem] = [
-            _PausedIcon(cgol)
+            _PausedIcon(cgol),
+            _GameSpeedMeter(cgol),
         ]
 
         # DO NOT initialize own reference to `alpha_canvas`.
@@ -41,11 +42,10 @@ class ControlPanel:
 
         self.cgol.alpha_canvas.fill(self.color, self.rect)
 
-        y = self.rect.y + self.padding
         current_x: int = self.rect.x + self.padding
         for count, item in enumerate(self.items, start=1):
             item_rect = item.rect
-            item_rect.y = y
+            item_rect.center = self.rect.center
 
             item_rect.x = current_x
             current_x += item.width
@@ -121,7 +121,6 @@ class _ControlItem:
     def __init__(self, cgol: ConwaysGameOfLife, size: tuple[int, int]) -> None:
         """Initialize attributes."""
         self.cgol = cgol
-        self.settings = self.cgol.settings
 
         self.width: int = size[0]
         self.height: int = size[1]
@@ -130,7 +129,7 @@ class _ControlItem:
     @property
     def surface(self) -> pygame.Surface:
         """Return the ``Surface`` of this control item."""
-        return pygame.Surface((self.width, self.height))
+        raise NotImplementedError
 
     @property
     def rect(self) -> pygame.Rect:
@@ -183,3 +182,48 @@ class _PausedIcon(_ControlItem):
         self.unpaused_img = pygame.transform.scale(
             self.unpaused_img, (target_width, target_height)
         )
+
+
+class _GameSpeedMeter(_ControlItem):
+    """Manage the game speed meter on the control panel."""
+
+    def __init__(self, cgol: ConwaysGameOfLife) -> None:
+        """Initialize attributes."""
+        self.settings = cgol.settings.control_panel.game_speed_meter
+        self.dynamic_settings = cgol.settings.dynamic
+
+        super().__init__(  # Assuming this would have the longest text ↓
+            cgol, self._get_surface(self.dynamic_settings.min_game_speed).size
+        )
+
+    @property
+    def surface(self) -> pygame.Surface:
+        """Get the ``Surface`` of the game speed meter."""
+        return self._get_surface()
+
+    def _get_surface(self, speed: float | None = None) -> pygame.Surface:
+        """Get the ``Surface`` of the game speed meter.
+
+        If ``speed`` is ``None``, the actual game speed will be used.
+        Otherwise, use the given string as the speed. (This is so that the
+        max possible length of this widget can be passed to ``ControlPanel``.
+        See super() call in __init__.)
+        """
+
+        return self.settings.font.render(
+            self._get_text_to_render(speed),
+            antialias=True, color=self.settings.font_color,
+        )
+
+    def _get_text_to_render(self, speed: float | None = None) -> str:
+        """Get the text to render on screen.
+
+        If ``speed`` is ``None``, the actual game speed will be used.
+        Otherwise, use the given string as the speed.
+        """
+        numer, denom = (
+            self.dynamic_settings.game_speed.as_integer_ratio()
+            if speed is None else speed.as_integer_ratio()
+        )
+        num: str = str(numer) if denom == 1 else f"{numer}/{denom}"
+        return f"{num} generation{"s" if numer/denom != 1 else ""}/sec"
