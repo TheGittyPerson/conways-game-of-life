@@ -137,37 +137,62 @@ class Grid:
             return self.cells_array[gridy][gridx]
         return None
 
-    def birth_cell_at_pos(self, mouse_pos: tuple[int, int]) -> None:
-        """Make alive the cell in which the given mouse position lands.
+    def birth_cells_on_line(self, pos1: tuple[int, int],
+                            pos2: tuple[int, int]) -> None:
+        """Make alive all cells between the given coordinates."""
+        for cell in self.get_cells_on_line(pos1, pos2):
+            cell.live()
 
-        Do nothing if the mouse is outside the grid.
+    def kill_cells_on_line(self, pos1: tuple[int, int],
+                           pos2: tuple[int, int]) -> None:
+        """Kill all cells between the given coordinates."""
+        for cell in self.get_cells_on_line(pos1, pos2):
+            cell.die()
+
+    def get_cell_at_pos(self, pos: tuple[int, int]) -> Cell | None:
+        """Get the cell in which the given coordinate lands.
+
+        Return None if the coordinate is outside the grid.
         """
-        target_cell = self.get_cell_at_pos(mouse_pos)
-        if target_cell is None:
-            return
-        target_cell.live()
-
-    def kill_cell_at_pos(self, mouse_pos: tuple[int, int]) -> None:
-        """Kill the cell in which the given mouse position lands.
-
-        Do nothing if the mouse is outside the grid.
-        """
-        target_cell = self.get_cell_at_pos(mouse_pos)
-        if target_cell is None:
-            return
-        target_cell.die()
-
-    def get_cell_at_pos(self, mouse_pos: tuple[int, int]) -> Cell | None:
-        """Get the cell in which the given mouse position lands.
-
-        Return None if the mouse is outside the grid.
-        """
-        mouse_x = mouse_pos[0]
-        mouse_y = mouse_pos[1]
+        mouse_x = pos[0]
+        mouse_y = pos[1]
         gridx = (mouse_x - self.x_single_margin) // self.settings.cell.width
         gridy = (mouse_y - self.y_single_margin) // self.settings.cell.height
         cell = self.get_cell(gridx, gridy)
         return cell
+
+    def get_cells_on_line(self, pos1: tuple[int, int],
+                          pos2: tuple[int, int]) -> list[Cell]:
+        """Return all cells that fall between the given coordinates."""
+        coords: list[tuple[int, int]] = self._get_coords_on_line(pos1, pos2)
+        return list(set([
+            cell for pos in coords
+            if (cell := self.get_cell_at_pos(pos)) is not None
+        ]))
+
+    @staticmethod
+    def _get_coords_on_line(pos1: tuple[int, int],
+                            pos2: tuple[int, int],
+                            step_size: float = 1) -> list[tuple[int, int]]:
+        """Return all coordinates that fall between the given points.
+
+        ``step_size`` is the distance (in px) between each point to calculate.
+        A smaller number means denser points and therefore a larger list of
+        coordinates.
+        """
+        v1 = pygame.math.Vector2(pos1)
+        v2 = pygame.math.Vector2(pos2)
+        distance: float = v1.distance_to(v2)
+
+        steps = int(distance / step_size) + 1
+
+        coords: list[tuple[int, int]] = []
+        for step_num in range(steps):
+            current_dist_along_line = step_num / max(steps, 1)
+            point: pygame.math.Vector2 = v1.lerp(v2, current_dist_along_line)
+            coords.append((int(point.x), int(point.y)))
+
+        return coords
 
     def _create_cell(self, posx: int, posy: int,
                      gridx: int, gridy: int) -> None:

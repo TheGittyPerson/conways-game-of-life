@@ -83,13 +83,16 @@ class EventHandler:
                                       event: pygame.Event) -> None:
         """Respond to mouse movement events."""
         self._handle_manual_cell_editing(event)
+        self.previous_mouse_pos = event.pos
 
     def _handle_manual_cell_editing(self, event: pygame.Event) -> None:
         """Birth or kill cells based on mouse position and button pressed."""
         if self.mouse_button_down == pygame.BUTTON_LEFT:
-            self.cgol.grid.birth_cell_at_pos(event.pos)
+            self.cgol.grid.birth_cells_on_line(self.previous_mouse_pos,
+                                               event.pos)
         if self.mouse_button_down == pygame.BUTTON_RIGHT:
-            self.cgol.grid.kill_cell_at_pos(event.pos)
+            self.cgol.grid.kill_cells_on_line(self.previous_mouse_pos,
+                                              event.pos)
 
     def _handle_window_resized_events(self) -> None:
         """Respond to window resized events."""
