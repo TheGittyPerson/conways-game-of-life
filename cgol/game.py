@@ -47,7 +47,7 @@ class ConwaysGameOfLife:
 
             self.clock.tick(self.settings.max_fps)
 
-        self._stop()
+        self._exit()
 
     def _update_screen(self) -> None:
         """Update the screen."""
@@ -62,6 +62,6 @@ class ConwaysGameOfLife:
         pygame.display.flip()
 
     @staticmethod
-    def _stop():
-        """Stop the game."""
+    def _exit():
+        """Exit the game."""
         pygame.quit()
