@@ -19,8 +19,8 @@ class Settings:
 class _ScreenSettings:
     def __init__(self):
         # When not in full screen
-        self.width: int = 1200
-        self.height: int = 700
+        self.width: int = 1200  # Columns of cells
+        self.height: int = 700  # Rows of cells
         self.min_width: int = 500
         self.min_height: int = 300
 
@@ -56,7 +56,8 @@ class _ControlPanelSettings:
 
         self.paused_icon = _PausedIconWidgetSettings()
         self.game_speed_widget = _GameSpeedMeterWidgetSettings()
-        self.generations_counter_widget = _GenerationCounterWidgetSettings()
+        self.generations_widget = _GenerationCounterWidgetSettings()
+        self.population_widget = _PopulationCounterWidgetSettings()
         self.other_info = _OtherGameInfoWidgetSettings()
 
 
@@ -83,6 +84,13 @@ class _GenerationCounterWidgetSettings:
         self.font_color: Color = Color(255, 255, 255)
 
         self.counter_cap: int = 9999999
+
+
+class _PopulationCounterWidgetSettings:
+    def __init__(self):
+        self.font: Font = font.SysFont(name="monospace", size=20,
+                                       bold=False, italic=False)
+        self.font_color: Color = Color(255, 255, 255)
 
 
 class _OtherGameInfoWidgetSettings:

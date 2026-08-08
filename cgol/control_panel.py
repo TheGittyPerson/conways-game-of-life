@@ -1,3 +1,4 @@
+from math import prod
 from typing import TYPE_CHECKING
 
 import pygame
@@ -24,6 +25,7 @@ class ControlPanel:
             _PausedIcon(cgol),
             _GameSpeedWidget(cgol),
             _GenerationCounterWidget(cgol),
+            _PopulationWidget(cgol),
             _FramerateWidget(cgol),
             _GenerationRateWidget(cgol),
         ]
@@ -263,8 +265,7 @@ class _GenerationCounterWidget(_TextWidget):
     def __init__(self, cgol: ConwaysGameOfLife) -> None:
         """Initialize attributes."""
         self.cgol = cgol
-        self.gcw_settings = \
-            cgol.settings.control_panel.generations_counter_widget
+        self.gcw_settings = cgol.settings.control_panel.generations_widget
         self.cap = self.gcw_settings.counter_cap
 
         super().__init__(cgol,
@@ -284,6 +285,32 @@ class _GenerationCounterWidget(_TextWidget):
             return f"t={self.cgol.generations}"
         else:
             return f"t>{self.cap}"
+
+
+class _PopulationWidget(_TextWidget):
+    """Manage the population widget on the control panel."""
+
+    def __init__(self, cgol: ConwaysGameOfLife) -> None:
+        self.cgol = cgol
+        self.pw_settings = cgol.settings.control_panel.population_widget
+
+        super().__init__(cgol,
+                         font=self.pw_settings.font,
+                         color=self.pw_settings.font_color)
+
+    def get_text_to_render(self, use_longest: bool = False) -> str:
+        """Get the text to render on screen.
+
+        If ``use_longest`` is True, the longest possible text (as in
+        physical length on screen, not character count) will be used.
+        Assumptions will inevitably have to be made. This prevents longer
+        text from overflowing past the widget's initial Rect passed to
+        ``ControlPanel`` (control panel dimensions are static).
+        """
+        longest = prod(self.cgol.settings.screen.dimensions)
+        count = self.cgol.grid.population \
+            if not use_longest else longest
+        return f"Population: {count}"
 
 
 class _FramerateWidget(_TextWidget):
@@ -359,8 +386,8 @@ class _GenerationRateWidget(_TextWidget):
         game_speed = self.cgol.settings.dynamic.game_speed
         gens_per_sec = (
             (self.cgol.clock.get_fps() * game_speed)
-            if not use_longest else longest
         )
         if self.cgol.events.paused:
             gens_per_sec = 0
-        return f"{gens_per_sec:.{self.dp}f} gen/s"
+        return \
+            f"{gens_per_sec if not use_longest else longest:.{self.dp}f} gen/s"
