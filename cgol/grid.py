@@ -62,7 +62,7 @@ class Grid:
 
         User-induced changes are detected and controlled in ``EventHandler``.
         """
-        paused = (self.cgol.events.paused or self.cgol.events.secondary_paused)
+        paused = self.cgol.events.paused or self.cgol.events.secondary_paused
 
         if not paused:
             self._increment_accumulator()
