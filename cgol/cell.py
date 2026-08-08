@@ -67,8 +67,13 @@ class Cell(Sprite):
             self.die()
 
     def use_next_alive_state(self) -> None:
-        """Set ``alive`` to ``next_alive_state``."""
-        self.alive = self.next_alive_state
+        """Set ``alive`` to ``next_alive_state``, update population count."""
+        if self.alive != self.next_alive_state:
+            if self.next_alive_state:
+                self.cgol.grid.population += 1
+            else:
+                self.cgol.grid.population -= 1
+            self.alive = self.next_alive_state
 
     def update_color(self) -> None:
         """Update the color of this cell and fill its image."""

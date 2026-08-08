@@ -19,21 +19,12 @@ class Grid:
 
         self.cells_group = pygame.sprite.Group()
         self.cells_array: list[list[Cell]] = [[]]
+        self.flat_cells_array: list[Cell] = []
+        self.population: int = 0
+        self.num_rows: int = 0
+        self.num_cols: int = 0
 
         self.update_accumulator: float = 0.0
-
-    @property
-    def rows(self) -> int:
-        """Return the number of rows in this grid.
-
-        Assume all rows are of the same length.
-        """
-        return len(self.cells_array)
-
-    @property
-    def columns(self) -> int:
-        """Return the number of columns in this grid."""
-        return len(self.cells_array[0])
 
     @property
     def x_single_margin(self) -> int:
@@ -63,19 +54,18 @@ class Grid:
 
         User-induced changes are detected and controlled in ``EventHandler``.
         """
-        flattened = self.get_flattened_cells_array()
         paused = (self.cgol.events.paused or self.cgol.events.secondary_paused)
 
         if not paused:
             self.increment_accumulator()
             while self.update_accumulator >= 1.0:
                 self._update_all_next_alive_states()
-                for cell in flattened:
+                for cell in self.flat_cells_array:
                     cell.use_next_alive_state()
                 self.update_accumulator -= 1.0
                 self.cgol.generations += 1
 
-        for cell in flattened:
+        for cell in self.flat_cells_array:
             cell.use_next_alive_state()
             cell.update_color()
 
@@ -137,6 +127,8 @@ class Grid:
 
             current_posy += cell_height
             current_gridy += 1
+        self.num_rows = len(self.cells_array)
+        self.num_cols += len(self.cells_array[0])
 
     def draw_all_cells(self) -> None:
         """Draw all cells."""
@@ -145,9 +137,10 @@ class Grid:
     def clear_all_cells(self) -> None:
         """Kill all cells and update colors, effectively resetting the grid.
 
-        Also resets generation count.
+        Also reset generation count and cached living cells count.
         """
         self.cgol.generations = 0
+        self.population = 0
         for cell in self.get_living_cells():
             cell.alive = False
             cell.next_alive_state = False
@@ -156,9 +149,11 @@ class Grid:
     def destroy(self):
         """Empty cell Group and array to free memory immediately.
 
-        Also reset generation count.
+        Also reset generation count and cached living cells count.
         """
         self.cgol.generations = 0
+        self.population = 0
+        self.num_cols = self.num_rows = 0
         self.cells_group.empty()
         self.cells_array.clear()
 
@@ -167,7 +162,7 @@ class Grid:
 
         Return ``None`` if the coordinate falls outside the grid.
         """
-        if 0 <= gridx < self.columns and 0 <= gridy < self.rows:
+        if 0 <= gridx < self.num_cols and 0 <= gridy < self.num_rows:
             return self.cells_array[gridy][gridx]
         return None
 
@@ -230,19 +225,15 @@ class Grid:
 
     def _create_cell(self, posx: int, posy: int,
                      gridx: int, gridy: int) -> None:
-        """Create a new cell."""
+        """Create a new cell and add it to the cells group and arrays."""
         new_cell = Cell(self.cgol, posx, posy, gridx, gridy)
         self.cells_group.add(new_cell)
-        try:
+        if len(self.cells_array) - 1 >= gridy:
             self.cells_array[gridy].append(new_cell)
-        except IndexError:
+        else:
             self.cells_array.append([new_cell])
+        self.flat_cells_array.append(new_cell)
 
     def get_living_cells(self) -> list[Cell]:
         """Get a list of all living cells."""
-        return [cell for cell in self.get_flattened_cells_array()
-                if cell.alive]
-
-    def get_flattened_cells_array(self):
-        """Get all cells as a flattened list."""
-        return [cell for row in self.cells_array for cell in row]
+        return [cell for cell in self.flat_cells_array if cell.alive]
