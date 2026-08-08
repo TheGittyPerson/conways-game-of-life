@@ -4,7 +4,7 @@ from . import Settings, Grid, EventHandler, ControlPanel
 
 # TODO:
 #   - App logo
-#   - README screenshot
+#   - README screenshot (with a shooter pattern)
 #   - Learn PyCharm
 
 
@@ -22,7 +22,13 @@ class ConwaysGameOfLife:
             self.settings.screen.dimensions,
             flags=pygame.RESIZABLE if self.settings.screen.resizable else 0
         )
+
         pygame.display.set_caption(self.settings.title)
+        self.app_icon = pygame.image.load(
+            self.settings.app_icon_img
+        ).convert_alpha()
+        pygame.display.set_icon(self.app_icon)
+
         # For elements that need opacity
         self.alpha_canvas = pygame.Surface(
             self.settings.screen.dimensions, flags=pygame.SRCALPHA

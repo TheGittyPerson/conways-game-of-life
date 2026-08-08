@@ -8,6 +8,8 @@ class Settings:
 
     def __init__(self):
         self.title: str = "Conway's Game of Life"
+        self.app_icon_img: Path = (Path(__file__).parent.parent
+                                   / "assets/app_icon.png").resolve()
         self.max_fps: int = 60
 
         self.screen: _ScreenSettings = _ScreenSettings()
