@@ -2,11 +2,6 @@ import pygame
 
 from . import Settings, Grid, EventHandler, ControlPanel
 
-# TODO:
-#   - App logo
-#   - README screenshot (with a shooter pattern)
-#   - Learn PyCharm
-
 
 class ConwaysGameOfLife:
     """Control and manage a new Game of Life."""
