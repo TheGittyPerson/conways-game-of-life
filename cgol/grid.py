@@ -67,7 +67,7 @@ class Grid:
         if not paused:
             self._increment_accumulator()
             while self.update_accumulator >= 1.0:
-                self._calculate_next_generation()
+                self._compute_next_generation()
                 for cell in self.changed_cells:
                     cell.use_next_alive_state()
                 self.update_accumulator -= 1.0
@@ -87,7 +87,7 @@ class Grid:
 
     # NATURAL GENERATION PROGRESSION
 
-    def _calculate_next_generation(self) -> None:
+    def _compute_next_generation(self) -> None:
         """Update the next alive states of all cells.
 
         Optimized to only check relevant cells that are alive or are next to
