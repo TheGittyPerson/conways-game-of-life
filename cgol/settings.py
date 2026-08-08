@@ -151,7 +151,7 @@ class _OtherGameInfoWidgetSettings:
         self.font_color: Color = Color(200, 200, 200)
 
         # Framerate Widget
-        self.fps_warning_threshold: int = 35  # warns when FPS drops below this
+        self.fps_warning_threshold: int = 25  # warns when FPS drops below this
         self.fps_warning_font_color: Color = Color(255, 70, 70)
         self.framerate_decimal_places: int = 1
 
