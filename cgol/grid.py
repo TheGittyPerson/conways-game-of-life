@@ -20,6 +20,7 @@ class Grid:
         self.cells_group = pygame.sprite.Group()
         self.cells_array: list[list[Cell]] = [[]]
         self.flat_cells_array: list[Cell] = []
+        self.changed_cells: list[Cell] = []
         self.population: int = 0
         self.num_rows: int = 0
         self.num_cols: int = 0
@@ -57,27 +58,29 @@ class Grid:
         paused = (self.cgol.events.paused or self.cgol.events.secondary_paused)
 
         if not paused:
-            self.increment_accumulator()
+            self._increment_accumulator()
             while self.update_accumulator >= 1.0:
                 self._update_all_next_alive_states()
-                for cell in self.flat_cells_array:
+                for cell in self.changed_cells:
                     cell.use_next_alive_state()
                 self.update_accumulator -= 1.0
                 self.cgol.generations += 1
 
-        for cell in self.flat_cells_array:
+        for cell in self.changed_cells:
             cell.use_next_alive_state()
             cell.update_color()
 
-    def increment_accumulator(self) -> None:
+        self.changed_cells = []
+
+    def _increment_accumulator(self) -> None:
         """Increment the accumulator by the game speed (gens per frame)."""
         self.update_accumulator += self.settings.dynamic.game_speed
 
-    def _update_all_next_alive_states(self):
+    def _update_all_next_alive_states(self) -> None:
         """Update the next alive states of all cells.
 
         Optimized to only check relevant cells that are alive or are next to
-        living cells.
+        living cells. Update changed cells list.
         """
         offset_coords: list[tuple[int, int]] = [
             (dx, dy)
@@ -98,10 +101,12 @@ class Grid:
                 )
                 neighbor_counter[neighbor_cell] += 1
 
+        neighbor_counter.pop(None, None)
+        neighbor_counter: Counter[Cell]
         for cell in neighbor_counter:
-            if cell is None:
-                continue
             cell.update_next_alive_state(neighbor_counter[cell])
+
+        self.changed_cells.extend(list(neighbor_counter.keys()))
 
     def create_grid(self) -> None:
         """Initialize a grid of cells.
@@ -141,21 +146,28 @@ class Grid:
         """
         self.cgol.generations = 0
         self.population = 0
+        self.changed_cells = []
         for cell in self.get_living_cells():
             cell.alive = False
             cell.next_alive_state = False
             cell.update_color()
 
     def destroy(self):
-        """Empty cell Group and array to free memory immediately.
+        """Empty cell Group and arrays to free memory immediately.
 
         Also reset generation count and cached living cells count.
         """
         self.cgol.generations = 0
         self.population = 0
         self.num_cols = self.num_rows = 0
+        self._clear_cell_group_and_all_cell_arrays()
+
+    def _clear_cell_group_and_all_cell_arrays(self):
+        """Empty cell Group and arrays to free memory immediately."""
         self.cells_group.empty()
         self.cells_array.clear()
+        self.flat_cells_array.clear()
+        self.changed_cells.clear()
 
     def get_cell(self, gridx: int, gridy: int) -> Cell | None:
         """Get the cell at the given grid position.
@@ -171,12 +183,14 @@ class Grid:
         """Make alive all cells between the given coordinates."""
         for cell in self.get_cells_on_line(pos1, pos2):
             cell.live()
+            self.changed_cells.append(cell)
 
     def kill_cells_on_line(self, pos1: tuple[int, int],
                            pos2: tuple[int, int]) -> None:
         """Kill all cells between the given coordinates."""
         for cell in self.get_cells_on_line(pos1, pos2):
             cell.die()
+            self.changed_cells.append(cell)
 
     def get_cell_at_pos(self, pos: tuple[int, int]) -> Cell | None:
         """Get the cell in which the given coordinate lands.
