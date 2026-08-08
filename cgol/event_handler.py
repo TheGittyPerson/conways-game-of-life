@@ -123,6 +123,8 @@ class EventHandler:
         self.cgol.alpha_canvas = pygame.Surface(
             self.cgol.screen.size, flags=pygame.SRCALPHA
         )
+        self.settings.screen.height = new_width
+        self.settings.screen.width = new_height
 
     def mouse_is_up(self) -> bool:
         """Check whether no mouse buttons are down."""

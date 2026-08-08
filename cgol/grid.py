@@ -31,7 +31,8 @@ class Grid:
     def x_single_margin(self) -> int:
         """Return the width of the left margin of the grid of cells."""
         cell_width = self.settings.cell.width
-        screen_width = self.cgol.screen.get_width()
+        # Dynamically changed in EventHandler window resized event
+        screen_width = self.settings.screen.width
         x_total_margin = screen_width % cell_width
         return x_total_margin // 2
 
@@ -39,7 +40,8 @@ class Grid:
     def y_single_margin(self) -> int:
         """Return the height of the top margin of the grid of cells."""
         cell_height = self.settings.cell.height
-        screen_height = self.cgol.screen.get_height()
+        # Dynamically changed in EventHandler window resized event
+        screen_height = self.settings.screen.height
         y_total_margin = screen_height % cell_height
         return y_total_margin // 2
 
@@ -115,7 +117,7 @@ class Grid:
         margins are equal.
         """
         cell_width, cell_height = self.settings.cell.dimensions
-        screen_width, screen_height = self.cgol.screen.get_size()
+        screen_width, screen_height = self.settings.screen.dimensions
 
         current_posx, current_posy = self.x_single_margin, self.y_single_margin
         current_gridx, current_gridy = 0, 0

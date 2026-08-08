@@ -11,7 +11,7 @@ class Settings:
         self.max_fps: int = 60
 
         self.screen: _ScreenSettings = _ScreenSettings()
-        self.dynamic: _DynamicSettings = _DynamicSettings()
+        self.dynamic: _GameSpeedSettings = _GameSpeedSettings()
         self.cell: _CellSettings = _CellSettings()
         self.control_panel: _ControlPanelSettings = _ControlPanelSettings()
 
@@ -44,6 +44,57 @@ class _CellSettings:
     @property
     def dimensions(self) -> tuple[int, int]:
         return self.width, self.height
+
+
+class _GameSpeedSettings:
+    def __init__(self):
+        # Number of generations per frame (to start the game with).
+        # 1.0 is around 60 gen/sec on a regular computer (if FPS is set to 60).
+        self._game_speed: float = 1.0
+        self.max_game_speed: float = 10.0
+        self.min_game_speed: float = 1/64
+
+    @property
+    def game_speed(self) -> float:
+        """Game speed in generations per frame."""
+        return min(
+            max(self._game_speed, self.min_game_speed),
+            self.max_game_speed
+        )
+
+    @game_speed.setter
+    def game_speed(self, game_speed: float) -> None:
+        """Game speed in generations per frame."""
+        self._game_speed = min(
+            max(game_speed, self.min_game_speed),
+            self.max_game_speed
+        )
+
+    def increase_game_speed(self):
+        """Increase game speed.
+
+        Game speed is measured in generations per frame.
+        Game speeds less than one increment by 0.25.
+        """
+        if self.game_speed >= 1:
+            self.game_speed += 1
+        elif self.game_speed >= 0.5:
+            self.game_speed += 0.25
+        else:
+            self.game_speed *= 2
+
+    def decrease_game_speed(self):
+        """Decrease game speed.
+
+        Game speed is measured in generations per frame.
+        Game speeds less than one decrement by 0.25
+        """
+        if self.game_speed < 0.5:
+            self.game_speed /= 2
+        elif self.game_speed <= 1:
+            self.game_speed -= 0.25
+        else:
+            self.game_speed -= 1
 
 
 class _ControlPanelSettings:
@@ -106,54 +157,3 @@ class _OtherGameInfoWidgetSettings:
 
         # Generation Rate Widget
         self.gen_rate_decimal_places: int = 1
-
-
-class _DynamicSettings:
-    def __init__(self):
-        # Number of generations per frame (to start the game with).
-        # 1.0 is around 60 gen/sec on a regular computer (if FPS is set to 60).
-        self._game_speed: float = 1.0
-        self.max_game_speed: float = 10.0
-        self.min_game_speed: float = 1/64
-
-    @property
-    def game_speed(self) -> float:
-        """Game speed in generations per frame."""
-        return min(
-            max(self._game_speed, self.min_game_speed),
-            self.max_game_speed
-        )
-
-    @game_speed.setter
-    def game_speed(self, game_speed: float) -> None:
-        """Game speed in generations per frame."""
-        self._game_speed = min(
-            max(game_speed, self.min_game_speed),
-            self.max_game_speed
-        )
-
-    def increase_game_speed(self):
-        """Increase game speed.
-
-        Game speed is measured in generations per frame.
-        Game speeds less than one increment by 0.25.
-        """
-        if self.game_speed >= 1:
-            self.game_speed += 1
-        elif self.game_speed >= 0.5:
-            self.game_speed += 0.25
-        else:
-            self.game_speed *= 2
-
-    def decrease_game_speed(self):
-        """Decrease game speed.
-
-        Game speed is measured in generations per frame.
-        Game speeds less than one decrement by 0.25
-        """
-        if self.game_speed < 0.5:
-            self.game_speed /= 2
-        elif self.game_speed <= 1:
-            self.game_speed -= 0.25
-        else:
-            self.game_speed -= 1
