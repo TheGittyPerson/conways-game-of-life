@@ -21,6 +21,7 @@ class Cell(Sprite):
         super().__init__()
 
         self.cgol = cgol
+        self.grid = self.cgol.grid
         self.settings = cgol.settings
 
         self.posx = posx
@@ -67,12 +68,20 @@ class Cell(Sprite):
             self.die()
 
     def use_next_alive_state(self) -> None:
-        """Set ``alive`` to ``next_alive_state``, update population count."""
+        """Set ``alive`` to ``next_alive_state``, update population count.
+
+        Of the Grid, this method updates:
+            - Population count
+            - Living cells set
+        """
         if self.alive != self.next_alive_state:
             if self.next_alive_state:
-                self.cgol.grid.population += 1
+                self.grid.population += 1
+                self.grid.living_cells.add(self)
             else:
-                self.cgol.grid.population -= 1
+                self.grid.population -= 1
+                if self in self.grid.living_cells:
+                    self.grid.living_cells.remove(self)
             self.alive = self.next_alive_state
 
     def update_color(self) -> None:

@@ -18,9 +18,10 @@ class Grid:
         self.settings = cgol.settings
 
         self.cells_group = pygame.sprite.Group()
-        self.cells_array: list[list[Cell]] = [[]]
+        self.cells_array: list[list[Cell]] = []
         self.flat_cells_array: list[Cell] = []
-        self.changed_cells: list[Cell] = []
+        self.living_cells: set[Cell] = set()
+        self.changed_cells: set[Cell] = set()
         self.population: int = 0
         self.num_rows: int = 0
         self.num_cols: int = 0
@@ -45,6 +46,8 @@ class Grid:
         y_total_margin = screen_height % cell_height
         return y_total_margin // 2
 
+    # ======================== MAIN GRID UPDATING LOOP ========================
+
     def update_all_cells(self) -> None:
         """Update all cell states and their colors and draw to screen.
 
@@ -55,6 +58,8 @@ class Grid:
         aliving/unaliving a cell will instantly update the cell's state and
         color).
 
+        Resets changed cells set after updating.
+
         User-induced changes are detected and controlled in ``EventHandler``.
         """
         paused = (self.cgol.events.paused or self.cgol.events.secondary_paused)
@@ -62,7 +67,7 @@ class Grid:
         if not paused:
             self._increment_accumulator()
             while self.update_accumulator >= 1.0:
-                self._update_all_next_alive_states()
+                self._calculate_next_generation()
                 for cell in self.changed_cells:
                     cell.use_next_alive_state()
                 self.update_accumulator -= 1.0
@@ -72,17 +77,21 @@ class Grid:
             cell.use_next_alive_state()
             cell.update_color()
 
-        self.changed_cells = []
+        self.changed_cells = set()
 
     def _increment_accumulator(self) -> None:
         """Increment the accumulator by the game speed (gens per frame)."""
         self.update_accumulator += self.settings.dynamic.game_speed
 
-    def _update_all_next_alive_states(self) -> None:
+    # ========================= CELL UPDATING/EDITING =========================
+
+    # NATURAL GENERATION PROGRESSION
+
+    def _calculate_next_generation(self) -> None:
         """Update the next alive states of all cells.
 
         Optimized to only check relevant cells that are alive or are next to
-        living cells. Update changed cells list.
+        living cells. Update changed cells set.
         """
         offset_coords: list[tuple[int, int]] = [
             (dx, dy)
@@ -91,12 +100,11 @@ class Grid:
             if not (dx == dy == 0)
         ]
 
-        living_cells: list[Cell] = self.get_living_cells()
         neighbor_counter: Counter[Cell | None] = Counter(
-            dict.fromkeys(living_cells, 0)
+            dict.fromkeys(self.living_cells, 0)
         )
 
-        for cell in living_cells:
+        for cell in self.living_cells:
             for offset in offset_coords:
                 neighbor_cell = self.get_cell(
                     cell.gridx + offset[0], cell.gridy + offset[1]
@@ -107,8 +115,28 @@ class Grid:
         neighbor_counter: Counter[Cell]
         for cell in neighbor_counter:
             cell.update_next_alive_state(neighbor_counter[cell])
+            self.changed_cells.add(cell)
 
-        self.changed_cells.extend(list(neighbor_counter.keys()))
+    # USER EDITS
+
+    def birth_cells_on_line(self, pos1: tuple[int, int],
+                            pos2: tuple[int, int]) -> None:
+        """Make alive all cells between the given coordinates."""
+        for cell in self.get_cells_on_line(pos1, pos2):
+            cell.live()
+            self.changed_cells.add(cell)
+            self.living_cells.add(cell)
+
+    def kill_cells_on_line(self, pos1: tuple[int, int],
+                           pos2: tuple[int, int]) -> None:
+        """Kill all cells between the given coordinates."""
+        for cell in self.get_cells_on_line(pos1, pos2):
+            cell.die()
+            self.changed_cells.add(cell)
+            if cell in self.living_cells:
+                self.living_cells.remove(cell)
+
+    # ========================= GRID CREATION =========================
 
     def create_grid(self) -> None:
         """Initialize a grid of cells.
@@ -141,35 +169,18 @@ class Grid:
         """Draw all cells."""
         self.cells_group.draw(self.cgol.screen)
 
-    def clear_all_cells(self) -> None:
-        """Kill all cells and update colors, effectively resetting the grid.
+    def _create_cell(self, posx: int, posy: int,
+                     gridx: int, gridy: int) -> None:
+        """Create a new cell and add it to the cells group and arrays."""
+        new_cell = Cell(self.cgol, posx, posy, gridx, gridy)
+        self.cells_group.add(new_cell)
+        if len(self.cells_array) - 1 >= gridy:
+            self.cells_array[gridy].append(new_cell)
+        else:
+            self.cells_array.append([new_cell])
+        self.flat_cells_array.append(new_cell)
 
-        Also reset generation count and cached living cells count.
-        """
-        self.cgol.generations = 0
-        self.population = 0
-        self.changed_cells = []
-        for cell in self.get_living_cells():
-            cell.alive = False
-            cell.next_alive_state = False
-            cell.update_color()
-
-    def destroy(self):
-        """Empty cell Group and arrays to free memory immediately.
-
-        Also reset generation count and cached living cells count.
-        """
-        self.cgol.generations = 0
-        self.population = 0
-        self.num_cols = self.num_rows = 0
-        self._clear_cell_group_and_all_cell_arrays()
-
-    def _clear_cell_group_and_all_cell_arrays(self):
-        """Empty cell Group and arrays to free memory immediately."""
-        self.cells_group.empty()
-        self.cells_array.clear()
-        self.flat_cells_array.clear()
-        self.changed_cells.clear()
+    # ========================= CELL-GETTING APIS =========================
 
     def get_cell(self, gridx: int, gridy: int) -> Cell | None:
         """Get the cell at the given grid position.
@@ -179,20 +190,6 @@ class Grid:
         if 0 <= gridx < self.num_cols and 0 <= gridy < self.num_rows:
             return self.cells_array[gridy][gridx]
         return None
-
-    def birth_cells_on_line(self, pos1: tuple[int, int],
-                            pos2: tuple[int, int]) -> None:
-        """Make alive all cells between the given coordinates."""
-        for cell in self.get_cells_on_line(pos1, pos2):
-            cell.live()
-            self.changed_cells.append(cell)
-
-    def kill_cells_on_line(self, pos1: tuple[int, int],
-                           pos2: tuple[int, int]) -> None:
-        """Kill all cells between the given coordinates."""
-        for cell in self.get_cells_on_line(pos1, pos2):
-            cell.die()
-            self.changed_cells.append(cell)
 
     def get_cell_at_pos(self, pos: tuple[int, int]) -> Cell | None:
         """Get the cell in which the given coordinate lands.
@@ -239,17 +236,36 @@ class Grid:
 
         return coords
 
-    def _create_cell(self, posx: int, posy: int,
-                     gridx: int, gridy: int) -> None:
-        """Create a new cell and add it to the cells group and arrays."""
-        new_cell = Cell(self.cgol, posx, posy, gridx, gridy)
-        self.cells_group.add(new_cell)
-        if len(self.cells_array) - 1 >= gridy:
-            self.cells_array[gridy].append(new_cell)
-        else:
-            self.cells_array.append([new_cell])
-        self.flat_cells_array.append(new_cell)
+    # ========================= CLEARING / RESETTING =========================
 
-    def get_living_cells(self) -> list[Cell]:
-        """Get a list of all living cells."""
-        return [cell for cell in self.flat_cells_array if cell.alive]
+    def clear_all_cells(self) -> None:
+        """Kill all cells and update colors, effectively resetting the grid.
+
+        Also reset generation count and cached living cells count.
+        """
+        self.cgol.generations = 0
+        self.population = 0
+        self.changed_cells = set()
+        for cell in self.living_cells:
+            cell.alive = False
+            cell.next_alive_state = False
+            cell.update_color()
+        self.living_cells = set()
+
+    def destroy(self):
+        """Empty cell Group and arrays to free memory immediately.
+
+        Also reset generation count and cached living cells count.
+        """
+        self.cgol.generations = 0
+        self.population = 0
+        self.num_cols = self.num_rows = 0
+        self._clear_cell_group_and_all_cell_arrays()
+
+    def _clear_cell_group_and_all_cell_arrays(self):
+        """Empty cell Group and arrays to free memory immediately."""
+        self.cells_group.empty()
+        self.cells_array.clear()
+        self.flat_cells_array.clear()
+        self.living_cells.clear()
+        self.changed_cells.clear()
