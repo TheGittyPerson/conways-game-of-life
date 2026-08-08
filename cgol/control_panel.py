@@ -1,4 +1,4 @@
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import pygame
 import pygame.font
@@ -191,15 +191,8 @@ class _TextWidget(_Widget):
     """Represents a text widget."""
 
     def __init__(self, cgol: ConwaysGameOfLife, font: pygame.Font,
-                 color: pygame.Color | None, longest: Any) -> None:
-        """Initialize attributes.
-
-        ``longest`` is the longest possible text (as in physical length on
-        screen, not character count) that will be shown. Assumptions will
-        inevitably have to be made. This prevents longer text from
-        overflowing past the widget's initial Rect passed to ``ControlPanel``
-        (control panel dimensions are static).
-        """
+                 color: pygame.Color | None) -> None:
+        """Initialize attributes."""
         self.cgol = cgol  # Initialize first cuz `_get_surface` or the
         #                   methods it calls might need it.
         self.dynamic_settings = cgol.settings.dynamic
@@ -207,28 +200,28 @@ class _TextWidget(_Widget):
         self.font: pygame.Font = font
         self.color: pygame.Color = color or pygame.Color(0, 0, 0)
 
-        self.longest: Any = longest
-        super().__init__(cgol, self.get_surface(self.longest).size)
+        super().__init__(cgol, self.get_surface(use_longest=True).size)
 
     @property
     def surface(self) -> pygame.Surface:
         """Get the ``Surface`` of this text widget."""
         return self.get_surface()
 
-    def get_surface(self, text: Any | None = None) -> pygame.Surface:
+    def get_surface(self, use_longest: bool = False) -> pygame.Surface:
         """Get the ``Surface`` of this text widget.
 
-        If ``text`` is ``None``, the actual value to render will be used.
-        Otherwise, use the given string as the text. (This is so that the
-        max possible length of this widget can be passed to ``ControlPanel``.
-        See super() call in __init__.)
+        If ``use_longest`` is True, the longest possible text (as in physical
+        length on screen, not character count) will be used.
+        Assumptions will inevitably have to be made. This prevents longer
+        text from overflowing past the widget's initial Rect passed to
+        ``ControlPanel`` (control panel dimensions are static).
         """
         return self.font.render(
-            self.get_text_to_render(text),
+            self.get_text_to_render(use_longest),
             antialias=True, color=self.color,
         )
 
-    def get_text_to_render(self, text: Any | None = None) -> str:
+    def get_text_to_render(self, use_longest: bool = False) -> str:
         """Get the text to render on screen."""
         raise NotImplementedError
 
@@ -243,18 +236,22 @@ class _GameSpeedWidget(_TextWidget):
 
         super().__init__(cgol,
                          font=self.gsm_settings.font,
-                         color=self.gsm_settings.font_color,
-                         longest=self.dynamic_settings.min_game_speed)
+                         color=self.gsm_settings.font_color)
 
-    def get_text_to_render(self, speed: float | None = None) -> str:
+    def get_text_to_render(self, use_longest: bool = False) -> str:
         """Get the text to render on screen.
 
-        If ``speed`` is ``None``, the actual game speed will be used.
-        Otherwise, use the given number as the speed.
+        If ``use_longest`` is True, the longest possible text (as in physical
+        length on screen, not character count) will be used.
+        Assumptions will inevitably have to be made. This prevents longer
+        text from overflowing past the widget's initial Rect passed to
+        ``ControlPanel`` (control panel dimensions are static).
         """
+        longest = self.dynamic_settings.min_game_speed
+
         numer, denom = (
             self.dynamic_settings.game_speed.as_integer_ratio()
-            if speed is None else speed.as_integer_ratio()
+            if not use_longest else longest.as_integer_ratio()
         )
         num: str = str(numer) if denom == 1 else f"{numer}/{denom}"
         return f"{num} generation{"s" if numer / denom != 1 else ""}/frame"
@@ -272,17 +269,19 @@ class _GenerationCounterWidget(_TextWidget):
 
         super().__init__(cgol,
                          font=self.gcw_settings.font,
-                         color=self.gcw_settings.font_color,
-                         longest=self.cap)
+                         color=self.gcw_settings.font_color)
 
-    def get_text_to_render(self, count: float | None = None) -> str:
+    def get_text_to_render(self, use_longest: bool = False) -> str:
         """Get the text to render on screen.
 
-        If ``count`` is ``None``, the actual game speed will be used.
-        Otherwise, use the given number as the speed.
+        If ``use_longest`` is True, the longest possible text (as in
+        physical length on screen, not character count) will be used.
+        Assumptions will inevitably have to be made. This prevents longer
+        text from overflowing past the widget's initial Rect passed to
+        ``ControlPanel`` (control panel dimensions are static).
         """
-        if self.cgol.generations <= self.cap:
-            return f"t={self.cgol.generations if count is None else count}"
+        if not use_longest and self.cgol.generations <= self.cap:
+            return f"t={self.cgol.generations}"
         else:
             return f"t>{self.cap}"
 
@@ -304,32 +303,32 @@ class _FramerateWidget(_TextWidget):
         self.normal_color = self.oi_settings.font_color
         self.warning_color = self.oi_settings.fps_warning_font_color
 
-        super().__init__(cgol, color=None, font=self.oi_settings.font,
-                         longest=self.max_fps)
+        super().__init__(cgol, color=None, font=self.oi_settings.font)
 
-    def get_surface(self, rate: int | None = None) -> pygame.Surface:
-        """Get the ``Surface`` of this text widget.
-
-        Text color depends on whether the game framerate dropped below the
-        warning threshold (also defined in settings).
-        """
+    def get_surface(self, use_longest: bool = False) -> pygame.Surface:
+        """Get the ``Surface`` of this text widget."""
         if self.cgol.clock.get_fps() > self.warning_threshold:
             color = self.normal_color
         else:
             color = self.warning_color
         return self.font.render(
-            self.get_text_to_render(rate),
+            self.get_text_to_render(use_longest),
             antialias=True, color=color,
         )
 
-    def get_text_to_render(self, rate: int | None = None) -> str:
+    def get_text_to_render(self, use_longest: bool = False) -> str:
         """Get the text to render on screen.
 
-        If ``rate`` is ``None``, the actual game speed will be used.
-        Otherwise, use the given string as the speed.
+        If ``use_longest`` is True, the longest possible text (as in
+        physical length on screen, not character count) will be used.
+        Assumptions will inevitably have to be made. This prevents longer
+        text from overflowing past the widget's initial Rect passed to
+        ``ControlPanel`` (control panel dimensions are static).
         """
+        longest = self.max_fps
+
         return f"{self.cgol.clock.get_fps()
-                  if rate is None else rate:.{self.dp}f} fps"
+                  if not use_longest else longest:.{self.dp}f} fps"
 
 
 class _GenerationRateWidget(_TextWidget):
@@ -343,20 +342,25 @@ class _GenerationRateWidget(_TextWidget):
         self.max_fps = cgol.settings.max_fps
         self.dp = self.oi_settings.gen_rate_decimal_places
 
-        super().__init__(
-            cgol, color=self.oi_settings.font_color,
-            font=self.oi_settings.font,
-            longest=self.max_fps * self.cgol.settings.dynamic.max_game_speed
-        )
+        super().__init__(cgol, color=self.oi_settings.font_color,
+                         font=self.oi_settings.font)
 
-    def get_text_to_render(self, rate: int | None = None) -> str:
+    def get_text_to_render(self, use_longest: bool = False) -> str:
         """Get the text to render on screen.
 
-        If ``rate`` is ``None``, the actual game speed will be used.
-        Otherwise, use the given string as the speed.
+        If ``use_longest`` is True, the longest possible text (as in
+        physical length on screen, not character count) will be used.
+        Assumptions will inevitably have to be made. This prevents longer
+        text from overflowing past the widget's initial Rect passed to
+        ``ControlPanel`` (control panel dimensions are static).
         """
+        longest = self.max_fps * self.cgol.settings.dynamic.max_game_speed
+
         game_speed = self.cgol.settings.dynamic.game_speed
         gens_per_sec = (
-            (self.cgol.clock.get_fps() * game_speed) if rate is None else rate
-        ) if not self.cgol.events.paused else 0
+            (self.cgol.clock.get_fps() * game_speed)
+            if not use_longest else longest
+        )
+        if self.cgol.events.paused:
+            gens_per_sec = 0
         return f"{gens_per_sec:.{self.dp}f} gen/s"

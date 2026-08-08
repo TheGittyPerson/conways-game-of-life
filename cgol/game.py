@@ -3,7 +3,6 @@ import pygame
 from . import Settings, Grid, EventHandler, ControlPanel
 
 # TODO:
-#   - Remove "longest" attribute and directly access longest in method
 #   - App logo
 #   - README screenshot
 #   - Learn PyCharm
