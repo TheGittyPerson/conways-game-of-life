@@ -387,7 +387,5 @@ class _GenerationRateWidget(_TextWidget):
         gens_per_sec = (
             (self.cgol.clock.get_fps() * game_speed)
         )
-        if self.cgol.events.paused:
-            gens_per_sec = 0
         return \
             f"{gens_per_sec if not use_longest else longest:.{self.dp}f} gen/s"
