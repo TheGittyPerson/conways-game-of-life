@@ -1,21 +1,25 @@
 # Conway's Game of Life <sub><sup>(v1.0.0)</sup></sub>
 
-A simple [Conway's Game of Life][wiki] in Python, built using the `pygame` 
-library.
+A simple [Conway's Game of Life][wiki] simulator in Python, built using the 
+`pygame-ce` framework.
 
 <img src="assets/screenshots/cover.jpg" alt="Screenshot of CGoL with the app logo in it">
 
 ## Game Info
 
-- Recommended Python version: >=3.14
-- Uses `pygame-ce` as main game library
+- **Recommended Python version: >=3.14**
+- Uses `pygame-ce` as primary game library
 - Compatible with macOS, Windows, Linux, and more!
 - Default maximum framerate (or tick rate) is 60 FPS
-- Extremely light-weight and easy to use with a simple UI
+- Extremely light-weight and easy to use, with a simple UI and clean code
+- Easy to modify and customize
+- Uses a strict OOP architecture (Everything on screen is controlled by
+  a native object)
+- Unfortunately, your CPU might get warm after a while...
 
 ## How to use
 
-Before running, install requirements:
+Before running, install the requirements:
 ```shell
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
@@ -54,28 +58,33 @@ Key commands:
   was resized)
 - `Q`: Quit
 
-You can adjust initial settings in `settings.py`.
+You can adjust settings in `settings.py`.
 
-## Tips
+## Tips 💡
 
-Variables that affect speed:
+Main variables that affect speed:
 - Number of cells to render (determined by window size and cell size)
-- Cell population
+- Cell population (number of living cells)
 - Generations to compute per frame
+- Your computer
+
+Read more about Conway's Game of Life at [LifeWiki.com][wiki-main]
+
+Here's a much better automaton if you're actually interested: https://conwaylife.com/
 
 ---
 
 ## Screenshots!
 
-### Gosper Glider Gun
+### [Gosper Glider Gun][ggg]
 
 <img src="assets/screenshots/gosper_glider_gun.jpg" alt="Gosper glider gun pattern">
 
-### Pufferfish
+### [Pufferfish][puffer]
 
 <img src="assets/screenshots/pufferfish.jpg" alt="Pufferfish pattern">
 
-### Pulsars
+### [Pulsars][pulsars]
 
 <img src="assets/screenshots/pulsars.jpg" alt="Pulsar Pattern">
 
@@ -86,4 +95,8 @@ Variables that affect speed:
 This project is licensed under the [MIT License](LICENSE.txt).
 
 [wiki]: https://conwaylife.com/wiki/Conway%27s_Game_of_Life
+[wiki-main]: https://conwaylife.com/wiki/Main_Page
+[ggg]: https://conwaylife.com/wiki/Gosper_glider_gun
+[puffer]: https://conwaylife.com/wiki/Pufferfish
+[pulsars]: https://conwaylife.com/wiki/Pulsar
 [pygame-ce]: https://pyga.me/
