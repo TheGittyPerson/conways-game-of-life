@@ -2,7 +2,7 @@ from . import ConwaysGameOfLife
 
 
 def main() -> None:
-    print("Initializing Conway's Game of Life...")
+    print("Initializing simulation...")
     cgol = ConwaysGameOfLife()
     print("Starting...")
     try:
