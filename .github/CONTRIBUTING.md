@@ -20,7 +20,6 @@ and experts are very welcome here.
 - [Code Guidelines](#code-guidelines)
 - [Making Your First Contribution](#making-your-first-contribution)
 
-
 ---
 
 ## Contributions You Can Make
@@ -30,7 +29,6 @@ There are many ways you can contribute:
 - [Finding and reporting bugs](#reporting-bugs)
 - Reformatting, refactoring, or enhancing code
 - Improving documentation
-- [Participating in discussions][repo-disc]
 - Helping to review or give feedback to pull requests or issues
 - Suggesting task issues (by opening a discussion)
 - ...etc
@@ -56,36 +54,30 @@ ones.
 
 ## Opening Issues
 
-**We highly recommend [opening an issue][repo-issues]** before creating a 
+**We highly recommend [opening an issue][issues]** before creating a 
 pull request. This is to ensure all changes are discussed properly (and you 
 don't waste your time creating a PR that ends up getting closed). 
 
 This is also to prevent automatically-generated pull requests created by 
-automated bot accounts that usually come with low effort and minimal engagement.
+automated bot accounts with minimal human insight.
 
 ### Reporting Bugs
 
 To report a bug:
-1. On the repository on GitHub, go to the [Issues][repo-issues] tab.
+1. On the repository on GitHub, go to the [Issues] tab.
 2. Select "New issue".
-3. **Template selection: Choose "Bug report"**.
+3. Use the bug report template section.
 4. Describe the issue thoroughly, using the template as a guide
-   - If your issue description severely lacks information, maintainers may 
-     close it.
 5. Submit the issue.
 
 ### Suggesting Features
 
 To suggest a feature:
-1. On the repository on GitHub, go to the [Issues][repo-issues] tab.
+1. On the repository on GitHub, go to the [Issues] tab.
 2. Select "New issue".
-3. **Template selection: Choose "Feature request"**
+3. Use the bug report template section.
 4. Describe the feature thoroughly, using the template as a guide.
-    - If your issue description severely lacks information, maintainers may 
-      close it.
 5. Submit the issue.
-
-...or add a comment under a [discussion][repo-disc] describing the feature.
 
 [^ TOC](#table-of-contents)
 
@@ -125,7 +117,7 @@ To suggest a feature:
 
 ## Code Guidelines
 
-Follow [PEP 8][pep-8]:
+Follow [PEP 8]:
 - **Line length** (try to keep lines **below 80 characters**; PEP 8 says 79 but
   both work)
 - **Naming conventions** (module, variable, class, and function names)
@@ -150,7 +142,8 @@ GitHub, here are some links with information that might help:
 
 [^ TOC](#table-of-contents)
 
+
 [repo]: https://github.com/TheGittyPerson/conways-game-of-life
-[repo-issues]: https://github.com/TheGittyPerson/conways-game-of-life/issues
-[repo-disc]: https://github.com/TheGittyPerson/conways-game-of-life/discussions
-[pep-8]: https://peps.python.org/pep-0008/
+[issues]: https://github.com/TheGittyPerson/conways-game-of-life/issues
+[pull requests]: https://github.com/TheGittyPerson/conways-game-of-life/pulls
+[pep 8]: https://peps.python.org/pep-0008/
