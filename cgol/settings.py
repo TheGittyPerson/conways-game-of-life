@@ -8,7 +8,7 @@ class Settings:
 
     def __init__(self):
         self.title: str = "Conway's Game of Life"
-        self.app_icon_img: Path = (Path(__file__).parent.parent
+        self.app_icon_img: Path = (Path(__file__).parent
                                    / "assets/app_icon.png").resolve()
         self.max_fps: int = 60
 
@@ -116,9 +116,9 @@ class _ControlPanelSettings:
 
 class _PausedIconWidgetSettings:
     def __init__(self):
-        self.paused_img_path: Path = (Path(__file__).parent.parent
+        self.paused_img_path: Path = (Path(__file__).parent
                                       / "assets/paused.png").resolve()
-        self.unpaused_img_path: Path = (Path(__file__).parent.parent
+        self.unpaused_img_path: Path = (Path(__file__).parent
                                         / "assets/unpaused.png").resolve()
         self.width: int = 30
 
