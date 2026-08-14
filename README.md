@@ -12,14 +12,13 @@ A simple [Conway's Game of Life][wiki] simulator in Python, built using the
 - Compatible with macOS, Windows, Linux, and more!
 - Default maximum framerate (or tick rate) is 60 FPS
 - Extremely light-weight and easy to use, with a simple UI and clean code
-- Easy to modify and customize
 - Uses a strict OOP architecture (Everything on screen is controlled by
   a native object)
 - Unfortunately, your CPU might get warm after a while...
 
 ## How to use
 
-To install
+To install (if you have `pipx` installed):
 ```shell
 pipx install git+https://github.com/TheGittyPerson/conways-game-of-life.git
 ```
