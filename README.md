@@ -1,4 +1,4 @@
-# Conway's Game of Life <sub><sup>(v1.0.0)</sup></sub>
+# Conway's Game of Life <sub><sup>(v1.0.1)</sup></sub>
 
 A simple [Conway's Game of Life][wiki] simulator in Python, built using the 
 `pygame-ce` framework.
@@ -19,25 +19,15 @@ A simple [Conway's Game of Life][wiki] simulator in Python, built using the
 
 ## How to use
 
-Before running, install the requirements:
+To install
 ```shell
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt
+pipx install git+https://github.com/TheGittyPerson/conways-game-of-life.git
 ```
 
-To start, run:
+To run:
+
 ```shell
-cd path/to/directory  # Replace with parent directory of the `cgol` package
-python -m cgol
-```
-
-Or:
-
-```python
-from cgol import ConwaysGameOfLife
-
-cgol = ConwaysGameOfLife()
-cgol.run()
+conway-life
 ```
 
 Simple!

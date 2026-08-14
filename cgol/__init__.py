@@ -23,7 +23,7 @@ A simple Conway's Game of Life in Python, using the ``pygame-ce`` library.
 Read about CGoL here: https://conwaylife.com/wiki/Conway%27s_Game_of_Life
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Morpheus"
 
 from .cell import Cell
