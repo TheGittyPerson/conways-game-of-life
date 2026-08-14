@@ -3,7 +3,7 @@
 A simple [Conway's Game of Life][wiki] simulator in Python, built using the 
 `pygame-ce` framework.
 
-<img src="assets/screenshots/cover.jpg" alt="Screenshot of CGoL with the app logo in it">
+<img src="cgol/assets/screenshots/cover.jpg" alt="Screenshot of CGoL with the app logo in it">
 
 ## Game Info
 
@@ -78,15 +78,15 @@ Here's a much better automaton if you're actually interested: https://conwaylife
 
 ### [Gosper Glider Gun][ggg]
 
-<img src="assets/screenshots/gosper_glider_gun.jpg" alt="Gosper glider gun pattern">
+<img src="cgol/assets/screenshots/gosper_glider_gun.jpg" alt="Gosper glider gun pattern">
 
 ### [Pufferfish][puffer]
 
-<img src="assets/screenshots/pufferfish.jpg" alt="Pufferfish pattern">
+<img src="cgol/assets/screenshots/pufferfish.jpg" alt="Pufferfish pattern">
 
 ### [Pulsars][pulsars]
 
-<img src="assets/screenshots/pulsars.jpg" alt="Pulsar Pattern">
+<img src="cgol/assets/screenshots/pulsars.jpg" alt="Pulsar Pattern">
 
 ---
 
